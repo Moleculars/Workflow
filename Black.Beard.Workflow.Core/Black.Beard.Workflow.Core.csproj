@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Bb.Workflow</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Core\Black.Beard.Core.csproj" />
+    <ProjectReference Include="..\Black.beard.Workflow.Models\Black.Beard.Workflow.Models.csproj" />
+  </ItemGroup>
+
+</Project>

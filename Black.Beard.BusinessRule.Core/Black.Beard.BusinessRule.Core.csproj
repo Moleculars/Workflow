@@ -1,0 +1,26 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Bb.BusinessRule</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Compile Remove="Audits\**" />
+    <Compile Remove="Chain\**" />
+    <EmbeddedResource Remove="Audits\**" />
+    <EmbeddedResource Remove="Chain\**" />
+    <None Remove="Audits\**" />
+    <None Remove="Chain\**" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Remove="Configurations\ResponsabilityChainParameter.cs" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.BusinessRule.Models\Black.Beard.BusinessRule.Models.csproj" />
+    <ProjectReference Include="..\Black.Beard.Core\Black.Beard.Core.csproj" />
+  </ItemGroup>
+
+</Project>

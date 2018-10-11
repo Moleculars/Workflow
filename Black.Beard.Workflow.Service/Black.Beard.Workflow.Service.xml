@@ -1,0 +1,175 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Black.Beard.Workflow.Service</name>
+    </assembly>
+    <members>
+        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationExtensions.InitializeWorkflowConfiguration(Bb.Workflow.Service.Configurations.HostContextBuilder)">
+            <summary>
+            Initialize configuration workflow
+            </summary>
+            <param name="hostContextBuilder"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationExtensions.BuildProcessor(System.String)">
+            <summary>
+            Fournit un environement d'évaluation de workflow
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationExtensions.RegisterWorkflowConfiguration(Bb.Workflow.Service.Configurations.HostContextBuilder,Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            register configuration by filename in IOC of web service .net core
+            </summary>
+            <param name="hostContextBuilder"></param>
+            <param name="services"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Configurations.DocumentationHelpers">
+            <summary>
+            concate OpenAPI documentation.
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Configurations.DocumentationHelpers.ConcateDocumentations(System.String)">
+            <summary>
+            Concate all documentations
+            </summary>
+            <param name="pattern"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Configurations.HostContextBuilder">
+            <summary>
+            Host conctext configuration builder
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Configurations.HostContextBuilder.#ctor(System.String)">
+            <summary>
+            Ctor
+            </summary>
+            <param name="path"></param>
+        </member>
+        <member name="P:Bb.Workflow.Service.Configurations.HostContextBuilder.ConfigurationPath">
+            <summary>
+            Configuration path
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Configurations.HostContextBuilder.WorkflowConfiguration">
+            <summary>
+            Workflow configuration
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Configurations.HostContextBuilder.CreateLocalContext(System.IServiceProvider)">
+            <summary>
+            Create a custom context vor every call
+            </summary>
+            <param name="serviceProvider"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Configurations.WorkflowConfigurationWeb">
+            <summary>
+            configuration
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Configurations.WorkflowConfigurationWeb.FolderConfiguration">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="T:Bb.Workflow.Service.Controllers.EnvironmentController">
+            <summary>
+            Provide the of all routes of the site
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.EnvironmentController.#ctor(Microsoft.AspNetCore.Mvc.Infrastructure.IActionDescriptorCollectionProvider)">
+            <summary>
+            Ctor
+            </summary>
+            <param name="actionDescriptorCollectionProvider"></param>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.EnvironmentController.GetAllRoutes">
+            <summary>
+            return the lst of routes
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Controllers.EventController">
+            <summary>
+            Append event in the workflow
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.EventController.Append(Bb.Workflow.Models.SourceEventTracing)">
+            <summary>
+            Append on the current config
+            </summary>
+            <param name="content"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.EventController.Append(System.String,Bb.Workflow.Models.SourceEventTracing)">
+            <summary>
+            Append on specific config
+            </summary>
+            <param name="version"></param>
+            <param name="content"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Controllers.SourceEventTracingModelBinder">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.SourceEventTracingModelBinder.BindModelAsync(Microsoft.AspNetCore.Mvc.ModelBinding.ModelBindingContext)">
+            <summary>
+            
+            </summary>
+            <param name="bindingContext"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Program">
+            <summary>
+            Class main 
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Program.Main(System.String[])">
+            <summary>
+            Subprogram main method
+            </summary>
+            <param name="args"></param>
+        </member>
+        <member name="M:Bb.Workflow.Service.Program.CreateWebHostBuilder(System.String[])">
+            <summary>
+            Create a webhost
+            </summary>
+            <param name="args"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Startup">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Startup.#ctor(Microsoft.Extensions.Configuration.IConfiguration)">
+            <summary>
+            Ctor
+            </summary>
+            <param name="configuration"></param>
+        </member>
+        <member name="P:Bb.Workflow.Service.Startup.Configuration">
+            <summary>
+            Configuration accessor
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Startup.ConfigureServices(Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+            <summary>
+            This method gets called by the runtime. Use this method to add services to the container.
+            </summary>
+            <param name="services"></param>
+        </member>
+        <member name="M:Bb.Workflow.Service.Startup.Configure(Microsoft.AspNetCore.Builder.IApplicationBuilder,Microsoft.AspNetCore.Hosting.IHostingEnvironment)">
+            <summary>
+            This method gets called by the runtime. Use this method to configure the HTTP request pipeline.
+            </summary>
+            <param name="app"></param>
+            <param name="env"></param>
+        </member>
+    </members>
+</doc>

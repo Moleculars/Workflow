@@ -1,0 +1,38 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+    <RootNamespace>Bb.BusinessRule.Parsers</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <None Remove="Grammar\BusinessRuleLexer.g4" />
+    <None Remove="Grammar\BusinessRuleParser.g4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Antlr4.Runtime.Standard" Version="4.7.1.1" />
+    <PackageReference Include="Ude.NetStandard" Version="1.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.BusinessRule.Models\Black.Beard.BusinessRule.Models.csproj" />
+    <ProjectReference Include="..\Black.Beard.Core\Black.Beard.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Compile Update="Grammar\Resources.Designer.cs">
+      <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
+      <AutoGen>True</AutoGen>
+    </Compile>
+  </ItemGroup>
+
+  <ItemGroup>
+    <EmbeddedResource Update="Grammar\Resources.resx">
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
+      <Generator>ResXFileCodeGenerator</Generator>
+    </EmbeddedResource>
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netcoreapp2.1</TargetFramework>
+
+    <IsPackable>false</IsPackable>
+
+    <RootNamespace>Bb.BusinessRule.Tests</RootNamespace>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.NET.Test.Sdk" Version="15.6.0" />
+    <PackageReference Include="MSTest.TestAdapter" Version="1.2.0" />
+    <PackageReference Include="MSTest.TestFramework" Version="1.2.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.BusinessRule.Core\Black.Beard.BusinessRule.Core.csproj" />
+    <ProjectReference Include="..\Black.Beard.BusinessRule.Models\Black.Beard.BusinessRule.Models.csproj" />
+    <ProjectReference Include="..\Black.Beard.BusinessRule.Parsers\Black.Beard.BusinessRule.Parsers.csproj" />
+  </ItemGroup>
+
+</Project>

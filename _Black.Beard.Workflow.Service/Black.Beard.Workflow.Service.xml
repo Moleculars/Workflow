@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<doc>
+    <assembly>
+        <name>Black.Beard.Workflow.Service</name>
+    </assembly>
+    <members>
+        <member name="T:Black.Beard.Workflow.Service.Controllers.EnvironmentController">
+            <summary>
+            Provide the of all routes of the site
+            </summary>
+        </member>
+        <member name="M:Black.Beard.Workflow.Service.Controllers.EnvironmentController.#ctor(Microsoft.AspNetCore.Mvc.Infrastructure.IActionDescriptorCollectionProvider)">
+            <summary>
+            Ctor
+            </summary>
+            <param name="actionDescriptorCollectionProvider"></param>
+        </member>
+        <member name="M:Black.Beard.Workflow.Service.Controllers.EnvironmentController.GetAllRoutes">
+            <summary>
+            return the lst of routes
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="T:Black.Beard.Workflow.Service.Controllers.SourceEventTracingModelBinder">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Black.Beard.Workflow.Service.Controllers.SourceEventTracingModelBinder.BindModelAsync(Microsoft.AspNetCore.Mvc.ModelBinding.ModelBindingContext)">
+            <summary>
+            
+            </summary>
+            <param name="bindingContext"></param>
+            <returns></returns>
+        </member>
+    </members>
+</doc>
