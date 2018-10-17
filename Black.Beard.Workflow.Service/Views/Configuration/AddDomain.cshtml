@@ -1,0 +1,30 @@
+﻿@model Bb.Workflow.Service.Models.MdlNameEditor
+@*@inject IViewLocalizer Localizer*@
+
+@{
+    var ctx = ViewData.Resolve<ConfigurationModelContext>();
+    await Html.RenderPartialAsync(@"TreeConfiguration.cshtml", ViewData);
+}
+
+<h2>Add a new domain</h2>
+
+<div class="col-md-9">
+    <form asp-action="CreateDomain">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="Name" class="control-label"></label>
+            <input asp-for="Name" class="form-control" />
+            <span asp-validation-for="Name" class="text-danger"></span>
+            <input asp-for="SelectedDomain" type="hidden" />
+            <input asp-for="SelectedVersion" type="hidden" />
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div>
+
+    </form>
+</div>
+

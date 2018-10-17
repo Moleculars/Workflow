@@ -16,11 +16,11 @@ namespace Bb.Workflow
     /// </summary>
     /// <typeparam name="TContext"></typeparam>
     /// <typeparam name="TSourceEvent"></typeparam>
-    /// <typeparam name="TWorkfloState"></typeparam>
-    public class WorkflowManagerProcessor<TContext, TSourceEvent, TWorkfloState>
-        where TContext : ContextWorkflow<TWorkfloState, TSourceEvent>, new()
+    /// <typeparam name="TWorkflowStateModel"></typeparam>
+    public class WorkflowManagerProcessor<TContext, TSourceEvent, TWorkflowStateModel>
+        where TContext : ContextWorkflow<TWorkflowStateModel, TSourceEvent>, new()
         where TSourceEvent : ISourceEvent
-        where TWorkfloState : WorkflowModel
+        where TWorkflowStateModel : WorkflowModel
     {
 
         /// <summary>
@@ -29,7 +29,7 @@ namespace Bb.Workflow
         /// <param name="businessRules"></param>
         /// <param name="contextStorageService"></param>
         /// <param name="validator"></param>
-        protected WorkflowManagerProcessor(RuleServiceProviderLoader<TSourceEvent, TContext> ruleService, EventValidator<TSourceEvent> validator, DataServiceSelector<TWorkfloState, TSourceEvent> eventSelector, ExtendedDataServiceProvider extendedDataServices, LQueue<PushedAction> queueOutput)
+        public WorkflowManagerProcessor(RuleServiceProviderLoader<TSourceEvent, TContext> ruleService, EventValidator<TSourceEvent> validator, DataServiceSelector<TWorkflowStateModel, TSourceEvent> eventSelector, ExtendedDataServiceProvider extendedDataServices, LQueue<PushedAction> queueOutput)
         {
             this._brService = ruleService ?? throw new ArgumentNullException(nameof(ruleService));
             this._validator = validator ?? throw new ArgumentNullException(nameof(validator));
@@ -41,10 +41,10 @@ namespace Bb.Workflow
         }
 
 
-        public List<TWorkfloState> Evaluate(TSourceEvent @event)
+        public List<TWorkflowStateModel> Evaluate(TSourceEvent @event)
         {
 
-            List<TWorkfloState> result = new List<TWorkfloState>();
+            List<TWorkflowStateModel> result = new List<TWorkflowStateModel>();
 
             TContext context = GetContext();
             context.SourceEvent = @event;
@@ -52,7 +52,7 @@ namespace Bb.Workflow
             List<ResultModel> _results = new List<ResultModel>();
 
             // resolve data context service
-            IDataService<TWorkfloState, TSourceEvent> WorkflowCrud = this._eventSelector.GetContextFor(context);
+            IDataService<TWorkflowStateModel, TSourceEvent> WorkflowCrud = this._eventSelector.GetContextFor(context);
 
             // Get all existing workflows on the context
             var items = WorkflowCrud.ReadItems(@event);
@@ -66,7 +66,7 @@ namespace Bb.Workflow
             ruleProvider.LoadDatas(context);
 
             if (items.Count > 0)        // Evaluate for every anomaly
-                foreach (TWorkfloState item in items)
+                foreach (TWorkflowStateModel item in items)
                 {
                     context.Workflow = item;
                     result.Add(Evaluate(context, WorkflowCrud, rules));
@@ -90,7 +90,7 @@ namespace Bb.Workflow
         /// <param name="results"></param>
         /// <param name="workflowCrud"></param>
         /// <returns></returns>
-        private TWorkfloState Evaluate(TContext context, IDataService<TWorkfloState, TSourceEvent> workflowCrud, Action<TContext, List<ResultModel>> rules)
+        private TWorkflowStateModel Evaluate(TContext context, IDataService<TWorkflowStateModel, TSourceEvent> workflowCrud, Action<TContext, List<ResultModel>> rules)
         {
 
             var results = context.EventResults;
@@ -174,7 +174,7 @@ namespace Bb.Workflow
 
         private readonly RuleServiceProviderLoader<TSourceEvent, TContext> _brService;
         private readonly EventValidator<TSourceEvent> _validator;
-        private readonly DataServiceSelector<TWorkfloState, TSourceEvent> _eventSelector;
+        private readonly DataServiceSelector<TWorkflowStateModel, TSourceEvent> _eventSelector;
         private readonly ExtendedDataServiceProvider _extendedDataServices;
         private readonly LQueue<PushedAction> _output;
     }

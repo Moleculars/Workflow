@@ -1,0 +1,82 @@
+﻿@*
+    For more information on enabling MVC for empty projects, visit http://go.microsoft.com/fwlink/?LinkID=397860
+*@
+
+@{
+    var ctx = ViewData.Resolve<ConfigurationModelContext>();
+}
+
+<div class="col-md-3">
+    <ul>
+        <li>
+            Domains&nbsp;<a href="@Url.RouteUrl("AddDomain", new { selectDomain = ctx?.SelectedDomain, selectVersion = ctx?.SelectedVersion })">Add Domain</a>
+
+            <ul>
+                @if (ctx != null)
+                {
+
+                    foreach (var domain in ctx.ConfigurationList.OrderBy(c => c.Name))
+                    {
+                        <li>
+                            @domain.Name
+
+                            <ul>
+                                <li>
+                                    Versions&nbsp;<a href="@Url.RouteUrl("AddVersion", new { domain = domain.Name, selectedDomain = ctx.SelectedDomain, selectedVersion = ctx.SelectedVersion })">Add version</a>
+                                    <ul>
+
+                                        @foreach (var version in domain.Versions)
+                                        {
+
+                                            string cls = string.Empty;
+                                            if (domain.Name == ctx.SelectedDomain && version.Name == ctx.SelectedVersion)
+                                            {
+                                                cls = "active";
+                                            }
+
+                                        <li class="active">
+
+                                            @if (!string.IsNullOrEmpty(cls))
+                                            {
+
+                                                <b>@version.Name</b>
+
+                                            }
+                                            else
+                                            {
+                                                <a href="@Url.RouteUrl("IndexConfigurations", new { domain = domain.Name, version = version.Name })">@version.Name</a>
+
+                                            }
+
+                                            @foreach (MdlConfigurationWkDomainVersionFileByType type in version.Types)
+                                            {
+                                                <ul>
+                                                    <li>
+                                                        @type.Type&nbsp;<a href="@Url.RouteUrl("AddFile", new { domain = domain.Name, version = version.Name, type = type.Type })">Add file</a>
+
+                                                        <ul>
+                                                            @foreach (MdlConfigurationWkDomainVersionFile file in type.Files)
+                                                            {
+                                                                <li>@file.Name</li>
+                                                            }
+                                                        </ul>
+                                                    </li>
+                                                </ul>
+
+                                            }
+                                        </li>
+                                        }
+
+                                    </ul>
+                                </li>
+
+
+                            </ul>
+
+                        </li>
+                    }
+                }
+            </ul>
+        </li>
+    </ul>
+</div>

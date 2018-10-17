@@ -10,6 +10,7 @@ using System.Linq;
 using System.Reflection;
 using System.Runtime.CompilerServices;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace Bb.Logs
 {
@@ -221,7 +222,7 @@ namespace Bb.Logs
             if (logLevel != Level.Off)
             {
                 log4net.Core.LoggingEvent logEntry = CreateLogEntry(logLevel, message, null, dicParameters);
-                Push(logEntry);
+                Task.Run(() => Push(logEntry));
             }
 
         }
@@ -413,7 +414,7 @@ namespace Bb.Logs
                 result.Properties["session"] = _sessionId;
                 result.Properties[name] = sb.ToString();
 
-                this.Push(result);
+                Task.Run(() => this.Push(result));
 
             }
         }

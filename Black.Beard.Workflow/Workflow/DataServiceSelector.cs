@@ -11,7 +11,7 @@ namespace Bb.Workflow
     /// </summary>
     /// <typeparam name="TState"></typeparam>
     /// <typeparam name="TEvent"></typeparam>
-    public abstract class DataServiceSelector<TState, TEvent>
+    public class DataServiceSelector<TState, TEvent>
          where TState : IWorkflowState
         where TEvent : ISourceEvent
     {

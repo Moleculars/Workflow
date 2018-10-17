@@ -13,7 +13,6 @@ namespace Bb.Workflow.Configurations.Rules
         where TContext : IWorkflowContext
     {
 
-
         public RuleServiceProviderLoader()
         {
             this._readKeys = new Dictionary<string, Func<TSourceEvent, string>>();

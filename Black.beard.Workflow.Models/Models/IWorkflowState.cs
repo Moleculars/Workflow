@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 
 namespace Bb.Workflow.Models
 {
@@ -28,6 +29,10 @@ namespace Bb.Workflow.Models
         /// External key associated to workflow. assigned from event external key value
         /// </summary>
         string ExternalKey { get; set; }
+
+        uint ProcessorCrc { get; }
+
+        List<StateEvent> Events { get; set; }
 
     }
 

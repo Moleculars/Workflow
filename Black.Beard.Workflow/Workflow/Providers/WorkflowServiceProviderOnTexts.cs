@@ -14,6 +14,7 @@ namespace Bb.Workflow.Providers
     public class WorkflowServiceProviderOnTexts<TEvent, TContext> : WorkflowService<TEvent, TContext> 
         where TEvent : ISourceEvent
         where TContext : IWorkflowContext
+
     {
 
         public WorkflowServiceProviderOnTexts(Func<string[]> items) : base()

@@ -4,9 +4,9 @@
         <name>Black.Beard.Workflow.Service</name>
     </assembly>
     <members>
-        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationExtensions.InitializeWorkflowConfiguration(Bb.Workflow.Service.Configurations.HostContextBuilder)">
+        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationExtensions.InitializeLocalStorageWorkflowConfiguration(Bb.Workflow.Service.Configurations.HostContextBuilder)">
             <summary>
-            Initialize configuration workflow
+            Initialize configuration workflow using local storage
             </summary>
             <param name="hostContextBuilder"></param>
             <returns></returns>
@@ -65,6 +65,16 @@
             <param name="serviceProvider"></param>
             <returns></returns>
         </member>
+        <member name="T:Bb.Workflow.Service.Configurations.HostContext">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Configurations.HostContext.WorkflowConfiguration">
+            <summary>
+            Workflow configuration
+            </summary>
+        </member>
         <member name="T:Bb.Workflow.Service.Configurations.WorkflowConfigurationWeb">
             <summary>
             configuration
@@ -74,6 +84,52 @@
             <summary>
             
             </summary>
+        </member>
+        <member name="T:Bb.Workflow.Service.Controllers.ConfigurationController">
+            <summary>
+            Append event in the workflow
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.#ctor(Bb.Workflow.Service.Configurations.HostContext)">
+            <summary>
+            Ctor
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.Index(System.String,System.String)">
+            <summary>
+            Configuration list page
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.AddDomain(System.String,System.String,System.String)">
+            <summary>
+            Adds the domain.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.AddDomain(Bb.Workflow.Service.Models.MdlNameEditor)">
+            <summary>
+            Adds the domain.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.AddVersion(System.String,System.String,System.String,System.String)">
+            <summary>
+            Adds the domain.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.AddVersion(Bb.Workflow.Service.Models.MdlNameEditor)">
+            <summary>
+            Adds the domain.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.AddFile(System.String,System.String,System.String)">
+            <summary>
+            Adds the file.
+            </summary>
+            <returns></returns>
         </member>
         <member name="T:Bb.Workflow.Service.Controllers.EnvironmentController">
             <summary>
@@ -104,10 +160,11 @@
             <param name="content"></param>
             <returns></returns>
         </member>
-        <member name="M:Bb.Workflow.Service.Controllers.EventController.Append(System.String,Bb.Workflow.Models.SourceEventTracing)">
+        <member name="M:Bb.Workflow.Service.Controllers.EventController.Append(System.String,System.String,Bb.Workflow.Models.SourceEventTracing)">
             <summary>
             Append on specific config
             </summary>
+            <param name="domain"></param>
             <param name="version"></param>
             <param name="content"></param>
             <returns></returns>
@@ -123,6 +180,229 @@
             </summary>
             <param name="bindingContext"></param>
             <returns></returns>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.ConfigurationModelContext.ConfigurationList">
+            <summary>
+            List of mapped configurations
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.ConfigurationModelContext.SelectedDomain">
+            <summary>
+            Gets the selected domain.
+            </summary>
+            <value>
+            The selected domain.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.ConfigurationModelContext.SelectedVersion">
+            <summary>
+            Gets the selected version.
+            </summary>
+            <value>
+            The selected version.
+            </value>
+        </member>
+        <member name="T:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions">
+            <summary>
+            MdlConfigurationWkDomain extensions
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.SelectDomainVersion(Bb.Workflow.Service.Models.ConfigurationModelContext)">
+            <summary>
+            Selects the domain version.
+            </summary>
+            <param name="self">The self.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Maps(System.Collections.Generic.IEnumerable{Bb.Workflow.IDomainConfiguration},System.String,System.String)">
+            <summary>
+            Map IEnumerable of domain
+            </summary>
+            <param name="domains">The domains.</param>
+            <param name="_domain">The domain.</param>
+            <param name="_version">The version.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Map(Bb.Workflow.IDomainConfiguration,System.Boolean,System.String)">
+            <summary>
+            Map one domain
+            </summary>
+            <param name="domain">The domain.</param>
+            <param name="_domain">The domain.</param>
+            <param name="_version">The version.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Map(Bb.Workflow.IConfigurationVersion)">
+            <summary>
+            Map IEnumerable
+            </summary>
+            <param name="version"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.MapWithFiles(Bb.Workflow.IConfigurationVersion)">
+            <summary>
+            Map IEnumerable
+            </summary>
+            <param name="version"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Models.Maps.ModelContextExtensions">
+            <summary>
+            ModelContext Extensions with DataView
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.Maps.ModelContextExtensions.RegisterForView(Bb.Workflow.Service.Models.ModelContext,Microsoft.AspNetCore.Mvc.Controller)">
+            <summary>
+            Register data in the viewdata
+            </summary>
+            <param name="ctx"></param>
+            <param name="controler"></param>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.Maps.ModelContextExtensions.Resolve``1(Microsoft.AspNetCore.Mvc.ViewFeatures.ViewDataDictionary)">
+            <summary>
+            Resolve datas from the viewdatas
+            </summary>
+            <typeparam name="T"></typeparam>
+            <param name="self"></param>
+            <returns></returns>
+        </member>
+        <member name="T:Bb.Workflow.Service.Models.MdlConfigurationWkDomain">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.MdlConfigurationWkDomain.#ctor">
+            <summary>
+            Ctor
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomain.Versions">
+            <summary>
+            List of versions
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomain.Name">
+            <summary>
+            Name of the domain workflow
+            </summary>
+        </member>
+        <member name="T:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersion">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersion.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersion"/> class.
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersion.Domain">
+            <summary>
+            Name of the version
+            </summary>
+            <value>
+            The name.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersion.Name">
+            <summary>
+            Name of the version
+            </summary>
+            <value>
+            The name.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersion.Types">
+            <summary>
+            List of the files
+            </summary>
+            <value>
+            The files.
+            </value>
+        </member>
+        <member name="T:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType">
+            <summary>
+            
+            </summary>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType.#ctor">
+            <summary>
+            Initializes a new instance of the <see cref="T:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType"/> class.
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType.Type">
+            <summary>
+            Gets the type.
+            </summary>
+            <value>
+            The type.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType.Files">
+            <summary>
+            Gets the files.
+            </summary>
+            <value>
+            The files.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile.Name">
+            <summary>
+            Gets the name.
+            </summary>
+            <value>
+            The name.
+            </value>
+        </member>
+        <member name="T:Bb.Workflow.Service.Models.MdlNameEditor">
+            <summary>
+            provide a model for editing names (domain, version, ...)
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlNameEditor.Name">
+            <summary>
+            Gets or sets the name.
+            </summary>
+            <value>
+            The name.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlNameEditor.SelectedDomain">
+            <summary>
+            Gets or sets the selected domain.
+            </summary>
+            <value>
+            The selected domain.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlNameEditor.SelectedVersion">
+            <summary>
+            Gets or sets the selected version.
+            </summary>
+            <value>
+            The selected version.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlNameEditor.IsValid">
+            <summary>
+            Returns true if ... is valid.
+            </summary>
+            <value>
+              <c>true</c> if this instance is valid; otherwise, <c>false</c>.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlNameEditor.Domain">
+            <summary>
+            Gets the domain.
+            </summary>
+            <value>
+            The domain.
+            </value>
+        </member>
+        <member name="T:Bb.Workflow.Service.Models.ModelContext">
+            <summary>
+            Model context base
+            </summary>
         </member>
         <member name="T:Bb.Workflow.Service.Program">
             <summary>

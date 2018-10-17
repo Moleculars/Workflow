@@ -17,14 +17,27 @@ namespace Bb.Workflow.Models
         string Key { get; }
 
         /// <summary>
-        /// External id 
+        /// External id . id of the object embedded in the message
         /// </summary>
         string Id { get; }
 
         /// <summary>
-        /// uuid
+        /// unique identity event
         /// </summary>
         Guid Uid { get; }
+
+        /// <summary>
+        /// Gets the date of the post.
+        /// </summary>
+        /// <value>
+        /// The post date.
+        /// </value>
+        DateTime PostDate { get; }
+
+        /// <summary>
+        /// Date of the event
+        /// </summary>
+        DateTime EventDate { get; }
 
     }
 

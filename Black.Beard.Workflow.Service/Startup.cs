@@ -89,7 +89,7 @@ namespace Bb.Workflow.Service
 
             // Initialize workflow configuration
             var ctxBuilder = new HostContextBuilder(Configuration.GetValue<string>("WorkflowConfig"))
-                .InitializeWorkflowConfiguration()
+                .InitializeLocalStorageWorkflowConfiguration()
                 .RegisterWorkflowConfiguration(services);
 
         }

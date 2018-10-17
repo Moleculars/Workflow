@@ -28,20 +28,33 @@ namespace Bb.Workflow.Service.Configurations
         /// <summary>
         /// Workflow configuration
         /// </summary>
-        public LocalStorageWorkflowConfigurationProvider WorkflowConfiguration { get; internal set; }
+        public IConfigurationProvider WorkflowConfiguration { get; internal set; }
 
         /// <summary>
         /// Create a custom context vor every call
         /// </summary>
         /// <param name="serviceProvider"></param>
         /// <returns></returns>
-        public HostContextBuilder CreateLocalContext(IServiceProvider serviceProvider)
+        public HostContext CreateLocalContext(IServiceProvider serviceProvider)
         {
-            return new HostContextBuilder(ConfigurationPath)
+            return new HostContext()
             {
-
+                WorkflowConfiguration = this.WorkflowConfiguration,
             };
         }
+
+    }
+
+    /// <summary>
+    /// 
+    /// </summary>
+    public class HostContext
+    {
+
+        /// <summary>
+        /// Workflow configuration
+        /// </summary>
+        public IConfigurationProvider WorkflowConfiguration { get; internal set; }
 
     }
 

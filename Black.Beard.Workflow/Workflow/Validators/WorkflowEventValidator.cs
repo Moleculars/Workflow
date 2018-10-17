@@ -11,9 +11,9 @@ namespace Bb.Workflow.Validators
         where TContext : IWorkflowContext
     {
 
-        private readonly WorkflowServiceProviderOnTexts<TEvent, TContext> _workflow;
+        private readonly WorkflowService<TEvent, TContext> _workflow;
 
-        public WorkflowEventValidator(WorkflowServiceProviderOnTexts<TEvent, TContext> workflow, EventValidator<TEvent> child = null) : base(child)
+        public WorkflowEventValidator(WorkflowService<TEvent, TContext> workflow, EventValidator<TEvent> child = null) : base(child)
         {
             this._workflow = workflow;
         }
@@ -24,6 +24,7 @@ namespace Bb.Workflow.Validators
             if (!wk.Events.ContainsKey(@event.Key))
                 throw new Exception($"invalid event {@event.Key}");
         }
+
     }
 
 

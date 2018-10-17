@@ -45,15 +45,17 @@ namespace Bb.Workflow.Models
             }
         }
         
+        public uint ProcessorCrc { get; set; }
+
         /// <summary>
         /// List of events appended
         /// </summary>
         public List<StateEvent> Events { get; set; }
 
-
         /// <summary>
         /// Ne pas serializer
         /// </summary>
+        //[JSonIgnore]
         public object WorkflowInstance { get; set; }
 
         private string _cCurrentStateKey;

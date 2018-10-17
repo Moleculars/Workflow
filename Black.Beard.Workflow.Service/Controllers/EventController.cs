@@ -30,7 +30,7 @@ namespace Bb.Workflow.Service.Controllers
         /// </summary>
         /// <param name="content"></param>
         /// <returns></returns>
-        [Route("append")]
+        [Route("{domain}/append")]
         [HttpPut()]
         public IActionResult Append([FromBody][ModelBinder(typeof(SourceEventTracingModelBinder))] SourceEventTracing content)
         {
@@ -52,12 +52,13 @@ namespace Bb.Workflow.Service.Controllers
         /// <summary>
         /// Append on specific config
         /// </summary>
+        /// <param name="domain"></param>
         /// <param name="version"></param>
         /// <param name="content"></param>
         /// <returns></returns>
-        [Route("append/{version}")]
+        [Route("{domain}/{version}/append")]
         [HttpPut()]
-        public IActionResult Append([FromRoute]string version, [FromBody][ModelBinder(typeof(SourceEventTracingModelBinder))] SourceEventTracing content)
+        public IActionResult Append([FromRoute]string domain, [FromRoute]string version, [FromBody][ModelBinder(typeof(SourceEventTracingModelBinder))] SourceEventTracing content)
         {
 
             return base.Ok();

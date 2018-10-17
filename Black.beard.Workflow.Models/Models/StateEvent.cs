@@ -24,16 +24,14 @@ namespace Bb.Workflow.Models
         /// </summary>
         public DateTime TransitionChangedAt { get; set; }
 
+        public DateTime EventDate { get; set; }
+
+        public DateTime PostDate { get; set; }
+
         /// <summary>
-        /// workflow processor crc
+        /// The key that must matching with config event key
         /// </summary>
-        public uint WorkflowProcessorCrc { get; set; }
-
-        
-        
-        //public int LastParcelStatut { get; set; }
-
-        //public int CurrentParcelStatut { get; set; }
+        public string Key { get; set; }
 
     }
 
