@@ -8,7 +8,7 @@ namespace Bb.Compilers.Pocos
 
         public AssemblyResult()
         {
-            this.Disgnostics = new List<string>();
+            Disgnostics = new List<string>();
         }
 
         public string AssemblyName { get; internal set; }
@@ -20,11 +20,11 @@ namespace Bb.Compilers.Pocos
         public string AssemblyFilePdb { get; internal set; }
 
         public List<string> Disgnostics { get; internal set; }
+        public bool Success { get; internal set; }
 
         public Assembly Load()
         {
-            return Assembly.LoadFile(this.AssemblyFile);
-            
+            return Assembly.LoadFile(AssemblyFile);
         }
 
     }

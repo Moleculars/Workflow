@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Bb.Core;
+using System;
 
 namespace Bb.Workflow.Models
 {

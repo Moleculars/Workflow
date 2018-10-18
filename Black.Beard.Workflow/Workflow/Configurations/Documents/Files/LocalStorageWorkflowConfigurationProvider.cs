@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 
 namespace Bb.Workflow.Service.Configurations.Documents.Files
 {
@@ -14,9 +15,14 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
         public LocalStorageWorkflowConfigurationProvider(DirectoryInfo path)
         {
             _path = path;
-            _dictionary = new Dictionary<string, LocalStorageDomainConfiguration>();
+            this._domains = new Dictionary<string, LocalStorageDomainConfiguration>();
+            this._templates = new Dictionary<string, IConfigurationTemplateFile>();
+
         }
 
+        /// <summary>
+        /// Parse all folder and lLoad all configuration in memory
+        /// </summary>
         public void Initialize()
         {
             foreach (var item in _path.GetDirectories())
@@ -39,11 +45,11 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
         public bool CreateDomainConfiguration(string name)
         {
 
-            this._path.Refresh();
+            _path.Refresh();
 
             try
             {
-                var dir = this._path.CreateSubdirectory(name);
+                var dir = _path.CreateSubdirectory(name);
                 EnsureLoaded(dir);
 
                 return true;
@@ -54,34 +60,72 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
                 throw;
             }
 
-                return false;
+            return false;
 
         }
 
-        private void EnsureLoaded(DirectoryInfo globalConfiguration)
+        private void EnsureLoaded(DirectoryInfo configuration)
         {
-            LocalStorageDomainConfiguration config = new LocalStorageDomainConfiguration(this, globalConfiguration.Name, globalConfiguration.FullName);
-            config.Initialize(globalConfiguration);
-            if (_dictionary.ContainsKey(config.Name))
-                _dictionary[config.Name] = config;
-            else
-                _dictionary.Add(config.Name, config);
+
+            switch (configuration.Name)
+            {
+                case "_templates":
+                    foreach (FileInfo template in configuration.GetFiles())
+                    {
+                        var t = new LocalStorageConfigurationFileTemlate(template);
+                        this._templates.Add(t.Name, t);
+                    }
+                    break;
+
+                default:    // Domains
+                    {
+                        LocalStorageDomainConfiguration config = new LocalStorageDomainConfiguration(this, configuration.Name, configuration.FullName);
+                        config.Initialize(configuration);
+                        if (_domains.ContainsKey(config.Name))
+                            _domains[config.Name] = config;
+                        else
+                            _domains.Add(config.Name, config);
+                    }
+                    break;
+            }
+
+
         }
+
+        /// <summary>
+        /// Gets the template list for the specified type.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public List<IConfigurationTemplateFile> GetTemplateFiles(string type)
+        {
+            var t = type.ToLowerInvariant();
+
+            List<IConfigurationTemplateFile> result = this._templates
+                .Values
+                .Where(c => c.Type.ToLowerInvariant() == t).Cast<IConfigurationTemplateFile>()
+                .ToList();
+
+            return result;
+
+        }
+
 
         public IEnumerable<IDomainConfiguration> GetDomainConfigurations()
         {
-            foreach (var item in _dictionary.Values)
+            foreach (var item in _domains.Values)
                 yield return item;
         }
 
         public IDomainConfiguration GetDomainConfiguration(string domain)
         {
-            if (_dictionary.TryGetValue(domain, out LocalStorageDomainConfiguration _dom))
+            if (_domains.TryGetValue(domain, out LocalStorageDomainConfiguration _dom))
                 return _dom;
             return null;
         }
 
-        private readonly Dictionary<string, LocalStorageDomainConfiguration> _dictionary;
+        private readonly Dictionary<string, LocalStorageDomainConfiguration> _domains;
+        private readonly Dictionary<string, IConfigurationTemplateFile> _templates;
         private readonly DirectoryInfo _path;
 
     }

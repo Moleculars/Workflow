@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Bb.Workflow.Models
+namespace Bb.Core
 {
 
     /// <summary>

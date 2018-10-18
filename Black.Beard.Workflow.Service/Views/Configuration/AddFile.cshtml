@@ -1,12 +1,34 @@
-﻿
-@{
+﻿@model Bb.Workflow.Service.Models.MdlIncomingFileEditor
+@*@inject IViewLocalizer Localizer*@
 
+
+@{
+    var ctx = ViewData.Resolve<ConfigurationModelContext>();
+    await Html.RenderPartialAsync(@"TreeConfiguration.cshtml", ViewData);
 }
 
-<h2>Add a new file</h2>
-<div class="row">
+<h2>Add a new file of type @Model.Type in the version @Model?.Version for the domain @Model?.Domain </h2>
 
-    @{
-        await Html.RenderPartialAsync(@"TreeConfiguration.cshtml", ViewData);
-    }
+<div class="col-md-9">
+    <form asp-action="CreateVersion">
+
+        <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+        <div class="form-group">
+            <label asp-for="ModelContent" class="control-label"></label>
+
+            @Html.TextAreaFor(c => c.ModelContent, 10, 30, new { @class="form-control" })
+
+            <span asp-validation-for="ModelContent" class="text-danger"></span>
+            <input asp-for="Domain" type="hidden" />
+            <input asp-for="Version" type="hidden" />
+            <input asp-for="Type" type="hidden" />
+        </div>
+
+        <div class="form-group">
+            <input type="submit" value="Save" class="btn btn-default" />
+        </div>
+
+    </form>
 </div>
+

@@ -1,9 +1,9 @@
-﻿using Newtonsoft.Json;
+﻿using Bb.Core;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
-namespace Bb.Workflow.Models
+namespace Bb.Core
 {
-
 
     public class PushedAction
     {

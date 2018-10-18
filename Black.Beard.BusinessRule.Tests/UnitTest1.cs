@@ -1,13 +1,17 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using Bb.ComponentModel;
-using Bb.ComponentModel.Attributes;
+using Bb.BusinessRule.Configurations;
 using Bb.BusinessRule.Core.Configurations;
 using Bb.BusinessRule.Models;
 using Bb.BusinessRule.Parser;
 using Bb.BusinessRule.Parser.Grammar;
+using Bb.ComponentModel.Attributes;
+using Bb.Workflow.Configurations.IncomingMessages;
+using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Linq.Expressions;
+using System.Text;
 
 namespace Bb.BusinessRule.Tests
 {
@@ -15,6 +19,49 @@ namespace Bb.BusinessRule.Tests
     [TestClass]
     public class UnitTest1
     {
+
+        [TestMethod]
+        public void TestMethodTranslateIncomingModelInPoco()
+        {
+
+            var txt = new StringBuilder(@"
+{
+	""Key"" : ""event_key"",
+	""Description"" : ""my description on incoming event"",
+	""ModelName"" : ""model_name"",
+	""Models"" : [
+		{
+			""Name"" : ""model_name"",
+			""Description"" : ""my description on model"",
+			""Properties"" : [
+					{ 
+						""Name"" : ""property1"",          
+						""Type"" : ""System.String"",     
+						""Description"" : ""Description of the property"", 
+						""IsArray"" : false 
+					},					
+				]
+		}
+	]
+}");
+            var rep = new PocoModelRepository("t1");
+            txt.DeserializeIncomingConfigModel().Convert(rep, "myDom", "myVer");
+
+            var path = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(Path.GetTempFileName()));
+
+            var resultAssembly = rep.Compile(path);
+
+            var ass = resultAssembly.Load();
+
+            var type = ass.DefinedTypes.FirstOrDefault();
+
+            dynamic instance = Activator.CreateInstance(type);
+
+            instance.Id = "test";
+
+        }
+
+
         [TestMethod]
         public void TestMethod1()
         {
@@ -35,7 +82,7 @@ namespace Bb.BusinessRule.Tests
             // Match config with method found in assemblies and build rules
             var visitor = new BuildBusinessRuleVisitor<Context>();
             LambdaExpression lambdaExpression = (LambdaExpression)BusinessRuleConfig.Accept(visitor);
-            var methodCompiled =  lambdaExpression.Compile() as Action<Context, List<ResultModel>>;
+            var methodCompiled = lambdaExpression.Compile() as Action<Context, List<ResultModel>>;
 
             // Test
             var c = new Context();

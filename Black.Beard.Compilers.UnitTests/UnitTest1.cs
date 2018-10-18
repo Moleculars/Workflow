@@ -1,8 +1,10 @@
 using Bb.Compilers.Pocos;
+using Bb.Core;
 using Bb.Workflow.Configurations.IncomingMessages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.IO;
-using System.Reflection;
+using System.Linq;
 
 namespace Black.Beard.Compilers.UnitTests
 {
@@ -53,12 +55,20 @@ namespace Black.Beard.Compilers.UnitTests
             repository.Usings.Add("Bb.ComponentModel.Attributes");
 
             var result = repository.Generate(new PocoCodeGenerator(
-                    typeof(Bb.Workflow.Models.ISourceEvent).Assembly, 
+                    typeof(ISourceEvent).Assembly,
                     typeof(Bb.ComponentModel.Attributes.ExposeIncomingMessage).Assembly
                 ), path);
 
 
             var ass = result.Load();
+
+            var type = ass.DefinedTypes.FirstOrDefault();
+
+            dynamic instance = Activator.CreateInstance(type) as ISourceEvent;
+
+            instance.Id = "test";
+
+
 
         }
     }

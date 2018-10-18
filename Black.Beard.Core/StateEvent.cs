@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace Bb.Workflow.Models
+namespace Bb.Core
 {
     public class StateEvent
     {

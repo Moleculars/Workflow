@@ -7,6 +7,7 @@ using Bb.Workflow.Validators;
 using Bb.Workflow.Contracts;
 using Bb.Workflow.Configurations.Rules;
 using Bb.Core.LocalQueue;
+using Bb.Core;
 
 namespace Bb.Workflow
 {

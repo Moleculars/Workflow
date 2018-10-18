@@ -1,3 +1,4 @@
+using Bb.Core;
 using Bb.Workflow.Configurations;
 using Bb.Workflow.Models;
 using Bb.Workflow.Parser;
@@ -52,9 +53,7 @@ DEFINE SEQUENCE 'End' ""End""
 	
     WITH FINAL STATE State_Ok           ""Ok""	
     
-;
-	
-";
+;";
 
 
             var parser = WorkflowConfigParser.ParseString(new System.Text.StringBuilder(rules));

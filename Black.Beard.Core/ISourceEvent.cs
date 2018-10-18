@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bb.Workflow.Models
+namespace Bb.Core
 {
 
     /// <summary>

@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Bb.Core;
+using System.Collections.Generic;
 
 namespace Bb.Workflow.Models
 {

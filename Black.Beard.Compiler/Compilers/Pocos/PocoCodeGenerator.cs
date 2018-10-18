@@ -1,4 +1,5 @@
-﻿using Bb.Workflow.Configurations.IncomingMessages;
+﻿using Bb.Compilers.Exceptions;
+using Bb.Workflow.Configurations.IncomingMessages;
 using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CSharp;
@@ -64,14 +65,15 @@ namespace Bb.Compilers.Pocos
 
             var parsedSyntaxTree = Parse(code, result);
 
-            CSharpCompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.NetModule)
+            CSharpCompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary)
                     .WithOverflowChecks(true)
 
                     .WithOptimizationLevel(System.Diagnostics.Debugger.IsAttached
                         ? Microsoft.CodeAnalysis.OptimizationLevel.Debug
                         : Microsoft.CodeAnalysis.OptimizationLevel.Release)
-                    
+
                     .WithPlatform(Platform.AnyCpu)
+                    .WithModuleName($"{namespaceName}.dll")
                     .WithUsings(repository.Usings);
 
             var compilation = CSharpCompilation.Create
@@ -81,9 +83,13 @@ namespace Bb.Compilers.Pocos
                     _defaultReferences,
                     DefaultCompilationOptions
                 );
-            
+
             try
             {
+
+                // emit the compilation result to a byte array corresponding to {AssemblyName}.netmodule byte code
+                //byte[] compilationAResult = compilation.EmitToArray(DiagnosticSeverity.Error, out CompilerException exception);
+                //Assembly newAssembly = Assembly.Load(compilationAResult);
 
                 using (var peStream = File.Create(result.AssemblyFile))
                 using (var pdbStream = File.Create(result.AssemblyFilePdb))
@@ -99,6 +105,17 @@ namespace Bb.Compilers.Pocos
 
                     foreach (Diagnostic diagnostic in resultEmit.Diagnostics)
                         result.Disgnostics.Add(diagnostic.ToString());
+
+                    result.Success = resultEmit.Success;
+
+                    if (!resultEmit.Success)
+                    {
+
+                        if (System.Diagnostics.Debugger.IsAttached)
+                            System.Diagnostics.Debugger.Break();
+
+                        throw new Exception("failed to generate");
+                    }
 
                 }
 
@@ -119,6 +136,10 @@ namespace Bb.Compilers.Pocos
 
         private static AssemblyResult GetAssemblyResult(string outputPah, string namespaceName)
         {
+
+            if (!Directory.Exists(outputPah))
+                Directory.CreateDirectory(outputPah);
+
             return new AssemblyResult()
             {
                 AssemblyName = namespaceName,
@@ -126,6 +147,7 @@ namespace Bb.Compilers.Pocos
                 AssemblyFile = Path.Combine(outputPah, $"{namespaceName}.dll"),
                 AssemblyFilePdb = Path.Combine(outputPah, $"{namespaceName}.pdb"),
             };
+
         }
 
         private static void ResetFilesIfExists(AssemblyResult result)
@@ -188,7 +210,7 @@ namespace Bb.Compilers.Pocos
                 {
 
                     var v = arg.IsString
-                            ? (CodeExpression)new CodePrimitiveExpression(arg.Value)
+                            ? new CodePrimitiveExpression(arg.Value)
                             : (CodeExpression)new CodeSnippetExpression(arg.Value);
 
                     _attribute.Arguments.Add(new CodeAttributeArgument()

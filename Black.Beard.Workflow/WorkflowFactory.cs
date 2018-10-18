@@ -1,4 +1,5 @@
 ﻿using Bb.BusinessRule.Models;
+using Bb.Core;
 using Bb.Core.LocalQueue;
 using Bb.Workflow;
 using Bb.Workflow.Configurations;

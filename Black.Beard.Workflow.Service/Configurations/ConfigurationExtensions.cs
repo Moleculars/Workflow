@@ -8,13 +8,21 @@ using System;
 namespace Bb.Workflow.Service.Configurations
 {
 
+    /// <summary>
+    /// translate configuration for the website
+    /// </summary>
     public static class ConfigurationExtensions
     {
 
+        /// <summary>
+        /// The available extensions
+        /// </summary>
         public static string[] AvailableExtensions = new string[] 
         {
+            "incomingMessage",
             "rules",
-            "workflows"
+            "workflows",
+
         };
 
 

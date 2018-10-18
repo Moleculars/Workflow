@@ -2,6 +2,7 @@
 using Bb.Workflow.Service.Models;
 using Bb.Workflow.Service.Models.Maps;
 using Microsoft.AspNetCore.Mvc;
+using System.Linq;
 
 namespace Bb.Workflow.Service.Controllers
 {
@@ -43,6 +44,8 @@ namespace Bb.Workflow.Service.Controllers
             return View();
 
         }
+
+        #region Domains
 
         /// <summary>
         /// Adds the domain.
@@ -86,9 +89,13 @@ namespace Bb.Workflow.Service.Controllers
             if (!form.IsValid || !_context.WorkflowConfiguration.CreateDomainConfiguration(form.Name))
                 return View("AddDomain", form);
 
-            return RedirectToAction("Index", new { domain = form.Name, version = "current"});
+            return RedirectToAction("Index", new { domain = form.Name, version = "current" });
 
         }
+
+        #endregion Domains
+
+        #region Versions
 
         /// <summary>
         /// Adds the domain.
@@ -147,9 +154,11 @@ namespace Bb.Workflow.Service.Controllers
             if (!form.IsValid || _dom == null || !_dom.CreateVersionConfiguration(form.Name))
                 return View("AddVersion", form);
 
-            return RedirectToAction("Index", new { domain = form.Domain, version = form.Name});
+            return RedirectToAction("Index", new { domain = form.Domain, version = form.Name });
 
         }
+
+        #endregion Versions
 
         /// <summary>
         /// Adds the file.
@@ -160,9 +169,13 @@ namespace Bb.Workflow.Service.Controllers
         {
 
             if (string.IsNullOrEmpty(domain))
-            {
+                throw new System.Exception($"argument {nameof(domain)} is required");
 
-            }
+            if (string.IsNullOrEmpty(version))
+                throw new System.Exception($"argument {nameof(version)} is required");
+
+            if (string.IsNullOrEmpty(type))
+                throw new System.Exception($"argument {nameof(type)} is required");
 
             new ConfigurationModelContext()
             {
@@ -174,7 +187,51 @@ namespace Bb.Workflow.Service.Controllers
             .SelectDomainVersion()
             .RegisterForView(this);
 
-            return View();
+
+            var template = _context
+                .WorkflowConfiguration
+                .GetTemplateFiles(type)
+                .FirstOrDefault()
+                ;
+
+            var model = new MdlIncomingFileEditor()
+            {
+                Domain = domain,
+                Version = version,
+                Type = type,
+                ModelContent = template?.Content ?? "no template",
+            };
+
+            return View(model);
+
+        }
+
+        [Route("CreateFile", Name = "CreateFile")]
+        public IActionResult AddFile(MdlIncomingFileEditor form)
+        {
+
+            if(ModelState.IsValid)
+            {
+
+                var _dom = _context.WorkflowConfiguration.GetDomainConfiguration(form.Domain);
+                if (_dom == null)
+                    ModelState.AddModelError("Domain", $"domain {form.Domain} not found");
+                else
+                {
+                    var _ver = _dom.GetVersion(form.Version);
+                    if (_ver == null)
+                        ModelState.AddModelError("Version", $"version {form.Version} not found in domain {form.Domain}");
+
+                    else
+                    {
+
+                    }
+
+                }
+
+            }
+
+            return View(form);
 
         }
 

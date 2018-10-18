@@ -1,4 +1,5 @@
-﻿using Bb.Workflow.Configurations;
+﻿using Bb.Core;
+using Bb.Workflow.Configurations;
 using Bb.Workflow.Models;
 using Bb.Workflow.Providers;
 using System;

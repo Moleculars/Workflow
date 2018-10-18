@@ -51,6 +51,11 @@ namespace Bb.Workflow.Service.Configurations
     public class HostContext
     {
 
+        public HostContext()
+        {
+
+        }
+
         /// <summary>
         /// Workflow configuration
         /// </summary>

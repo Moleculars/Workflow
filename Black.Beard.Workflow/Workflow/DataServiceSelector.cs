@@ -1,4 +1,5 @@
-﻿using Bb.Workflow.Contracts;
+﻿using Bb.Core;
+using Bb.Workflow.Contracts;
 using Bb.Workflow.Models;
 using System;
 using System.Collections.Generic;
