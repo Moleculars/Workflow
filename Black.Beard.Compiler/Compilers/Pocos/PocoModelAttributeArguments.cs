@@ -2,10 +2,20 @@
 using System.Collections.Generic;
 using System.Text;
 
-namespace Bb.Workflow.Configurations.IncomingMessages
+namespace Bb.Compilers.Pocos
 {
     public class PocoModelAttributeArguments : List<PocoModelAttributeArgument>
     {
+
+        public PocoModelAttributeArguments() : base()
+        {
+
+        }
+
+        public PocoModelAttributeArguments(IEnumerable<PocoModelAttributeArgument> collection) : base(collection)
+        {
+        }
+
         internal void Crc(StringBuilder sb)
         {
             string comma = string.Empty;

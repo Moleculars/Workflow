@@ -2,7 +2,7 @@
 using System.Linq;
 using System.Text;
 
-namespace Bb.Workflow.Configurations.IncomingMessages
+namespace Bb.Compilers.Pocos
 {
 
     public class PocoProperties : List<PocoProperty>

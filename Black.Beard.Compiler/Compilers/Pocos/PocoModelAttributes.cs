@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Text;
 
-namespace Bb.Workflow.Configurations.IncomingMessages
+namespace Bb.Compilers.Pocos
 {
     public class PocoModelAttributes : List<PocoModelAttribute>
     {

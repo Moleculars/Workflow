@@ -32,12 +32,12 @@ namespace Bb.Core
         /// <value>
         /// The post date.
         /// </value>
-        DateTime PostDate { get; }
+        DateTimeOffset PostDate { get; }
 
         /// <summary>
         /// Date of the event
         /// </summary>
-        DateTime EventDate { get; }
+        DateTimeOffset EventDate { get; }
 
     }
 

@@ -29,12 +29,12 @@
 //        /// <value>
 //        /// The post date.
 //        /// </value>
-//        public DateTime PostDate { get; set; }
+//        public DateTimeOffset PostDate { get; set; }
 
 //        /// <summary>
 //        /// Date of the event
 //        /// </summary>
-//        public DateTime EventDate { get; set; }
+//        public DateTimeOffset EventDate { get; set; }
 
 //    }
 

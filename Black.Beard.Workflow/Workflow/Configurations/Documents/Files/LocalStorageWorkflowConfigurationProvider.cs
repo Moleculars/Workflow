@@ -1,10 +1,13 @@
-﻿using System;
+﻿using Bb.BusinessRule.Configurations;
+using Bb.Core.Documents;
+using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 
-namespace Bb.Workflow.Service.Configurations.Documents.Files
+namespace Bb.Workflow.Configurations.Documents.Files
 {
+
+
 
     /// <summary>
     /// Reference a folder path for collect all versions of the configuration
@@ -14,11 +17,28 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
 
         public LocalStorageWorkflowConfigurationProvider(DirectoryInfo path)
         {
+            
             _path = path;
-            this._domains = new Dictionary<string, LocalStorageDomainConfiguration>();
-            this._templates = new Dictionary<string, IConfigurationTemplateFile>();
+            _domains = new Dictionary<string, LocalStorageDomainConfiguration>();
+            _types = new TypeConfigurations
+            (
+                new TypeConfiguration("Incoming Messages", "Configuration for incoming messages", "imsg") { Compiler = new IncomingMessageCompiler() },
+                new TypeConfiguration("State Models", "Configuration for states models", "state") { Compiler = new StateMessageCompiler() },
+                new TypeConfiguration("Rules", "rules to apply on incoming message", "rules"),
+                new TypeConfiguration("Func rules", "Function rules to apply on incoming message", "csRules"),
+                new TypeConfiguration("Workflows", "workflow's configurations", "workflows"),
+                new TypeConfiguration("Func Workflows", "Function for evaluate workflow", "csworkflows")
+            );
 
         }
+
+        /// <summary>
+        /// Gets the list of types of configuration.
+        /// </summary>
+        /// <value>
+        /// The types.
+        /// </value>
+        public TypeConfigurations Types => _types;
 
         /// <summary>
         /// Parse all folder and lLoad all configuration in memory
@@ -72,8 +92,8 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
                 case "_templates":
                     foreach (FileInfo template in configuration.GetFiles())
                     {
-                        var t = new LocalStorageConfigurationFileTemlate(template);
-                        this._templates.Add(t.Name, t);
+                        var t = new LocalStorageConfigurationDocumentTemlate(template);
+                        Types.Add(t);
                     }
                     break;
 
@@ -100,14 +120,7 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
         public List<IConfigurationTemplateFile> GetTemplateFiles(string type)
         {
             var t = type.ToLowerInvariant();
-
-            List<IConfigurationTemplateFile> result = this._templates
-                .Values
-                .Where(c => c.Type.ToLowerInvariant() == t).Cast<IConfigurationTemplateFile>()
-                .ToList();
-
-            return result;
-
+            return Types.GetByName(type).GetTemplates();
         }
 
 
@@ -125,8 +138,8 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
         }
 
         private readonly Dictionary<string, LocalStorageDomainConfiguration> _domains;
-        private readonly Dictionary<string, IConfigurationTemplateFile> _templates;
         private readonly DirectoryInfo _path;
+        private readonly TypeConfigurations _types;
 
     }
 

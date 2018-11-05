@@ -1,6 +1,6 @@
 using Bb.Compilers.Pocos;
+using Bb.ComponentModel.Attributes;
 using Bb.Core;
-using Bb.Workflow.Configurations.IncomingMessages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.IO;
@@ -30,16 +30,11 @@ namespace Black.Beard.Compilers.UnitTests
                 Interfaces = new PocoInterfaces() { "ISourceEvent" },
                 Attributes = new PocoModelAttributes()
                 {
-                    new PocoModelAttribute()
-                    {
-                        Name = "ExposeIncomingMessage",
-                        Arguments = new PocoModelAttributeArguments()
-                        {
-                            new PocoModelAttributeArgument() { Value = "myDomain", IsString = true },
-                            new PocoModelAttributeArgument() { Value = "myVersion", IsString = true },
-                            new PocoModelAttributeArgument() { Value = "myKey", IsString = true }
-                        }
-                    }
+                    new PocoModelAttribute("ExposeIncomingMessage",
+                        new PocoModelAttributeArgument() { Value = "myDomain", IsString = true },
+                        new PocoModelAttributeArgument() { Value = "myVersion", IsString = true },
+                        new PocoModelAttributeArgument() { Value = "myKey", IsString = true }
+                    )
                 },
                 Properties = new PocoProperties()
                 {
@@ -51,13 +46,12 @@ namespace Black.Beard.Compilers.UnitTests
                 }
             });
 
-            repository.Usings.Add("Bb.Workflow.Models");
-            repository.Usings.Add("Bb.ComponentModel.Attributes");
+            repository.AddUsings(
+                typeof(ISourceEvent),
+                typeof(ExposeIncomingMessage)
+                );
 
-            var result = repository.Generate(new PocoCodeGenerator(
-                    typeof(ISourceEvent).Assembly,
-                    typeof(Bb.ComponentModel.Attributes.ExposeIncomingMessage).Assembly
-                ), path);
+            var result = repository.Generate(path);
 
 
             var ass = result.Load();

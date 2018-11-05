@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace Bb.Workflow.Configurations.IncomingMessages
+namespace Bb.Compilers.Pocos
 {
     public class PocoInterfaces : List<string>
     {

@@ -87,7 +87,7 @@ namespace Bb.Workflow.Service
 
             });
 
-            // Initialize workflow configuration
+            // Initialize workflow configuration document provider
             var ctxBuilder = new HostContextBuilder(Configuration.GetValue<string>("WorkflowConfig"))
                 .InitializeLocalStorageWorkflowConfiguration()
                 .RegisterWorkflowConfiguration(services);

@@ -5,4 +5,10 @@
     <RootNamespace>Bb.BusinessRule</RootNamespace>
   </PropertyGroup>
 
+  <ItemGroup>
+    <Compile Remove="Models\IncomingConfigs\**" />
+    <EmbeddedResource Remove="Models\IncomingConfigs\**" />
+    <None Remove="Models\IncomingConfigs\**" />
+  </ItemGroup>
+
 </Project>

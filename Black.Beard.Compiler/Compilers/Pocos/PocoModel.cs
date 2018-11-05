@@ -1,17 +1,20 @@
 ﻿using System.Linq;
 using System.Text;
 
-namespace Bb.Workflow.Configurations.IncomingMessages
+namespace Bb.Compilers.Pocos
 {
 
+    [System.Diagnostics.DebuggerDisplay("class {Name}")]
     public class PocoModel
     {
 
-        public PocoModel()
+        public PocoModel(params PocoProperty[] properties)
         {
             Properties = new PocoProperties();
             Interfaces = new PocoInterfaces();
             Attributes = new PocoModelAttributes();
+            if (properties != null)
+                Properties.AddRange(properties);
         }
 
         public string Name { get; set; }

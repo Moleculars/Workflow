@@ -1,5 +1,8 @@
-﻿using Bb.Workflow.Service.Configurations;
+﻿using Bb.Core;
+using Bb.Core.Documents;
+using Bb.Workflow.Service.Configurations;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 
 namespace Bb.Workflow.Service.Models.Maps
@@ -112,7 +115,7 @@ namespace Bb.Workflow.Service.Models.Maps
 
 
         /// <summary>
-        /// Map IEnumerable
+        /// Map IConfigurationVersion in model for site
         /// </summary>
         /// <param name="version"></param>
         /// <returns></returns>
@@ -123,22 +126,30 @@ namespace Bb.Workflow.Service.Models.Maps
 
             Dictionary<string, MdlConfigurationWkDomainVersionFileByType> _dic = new Dictionary<string, MdlConfigurationWkDomainVersionFileByType>();
 
-            foreach (var item in ConfigurationExtensions.AvailableExtensions)
-                GetList(_dic, item);
+            foreach (TypeConfiguration typeConfig in version.Parent.Parent.Types)
+                GetList(_dic, typeConfig);
 
-            foreach (IConfigurationFile file in version.Files)
+            foreach (IConfigurationDocument file in version.Documents)
             {
 
-                MdlConfigurationWkDomainVersionFileByType type = GetList(_dic, file.Type);
 
-                type.Files.Add(new MdlConfigurationWkDomainVersionFile()
+                MdlConfigurationWkDomainVersionFileByType type = GetList(_dic, file.TypeConfiguration);
+
+                if (type != null)
                 {
-                    Name = file.Name,
-                    Type = file.Type,
-                    Path = file.Path,
-                    CreationDate = file.CreationDate,
-                    LastUpdate = file.LastUpdate,
-                });
+
+                    type.Files.Add(new MdlConfigurationWkDomainVersionFile()
+                    {
+                        Name = file.Name,
+                        Type = file.TypeConfiguration.Extension,
+                        CreationDate = file.CreationDate,
+                        LastUpdate = file.LastUpdate,
+                        TypeConfiguration = file.TypeConfiguration,
+                    });
+
+                }
+                else
+                    Trace.WriteLine($"the extension {file.TypeConfiguration.Extension} can resolve the configuration type");
 
             }
 
@@ -149,13 +160,19 @@ namespace Bb.Workflow.Service.Models.Maps
 
         }
 
-        private static MdlConfigurationWkDomainVersionFileByType GetList(Dictionary<string, MdlConfigurationWkDomainVersionFileByType> _dic, string typeName)
+        /// <summary>
+        /// Gets the list of files grouped by type of file.
+        /// </summary>
+        /// <param name="_dic">The dic.</param>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        private static MdlConfigurationWkDomainVersionFileByType GetList(Dictionary<string, MdlConfigurationWkDomainVersionFileByType> _dic, TypeConfiguration type)
         {
 
-            if (!_dic.TryGetValue(typeName, out MdlConfigurationWkDomainVersionFileByType type))
-                _dic.Add(typeName, type = new MdlConfigurationWkDomainVersionFileByType() { Type = typeName });
+            if (!_dic.TryGetValue(type.Name, out MdlConfigurationWkDomainVersionFileByType _type))
+                _dic.Add(type.Name, _type = new MdlConfigurationWkDomainVersionFileByType() { Type = type.Name, ConfigurationType = type });
 
-            return type;
+            return _type;
 
         }
     }

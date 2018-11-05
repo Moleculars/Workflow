@@ -1,42 +1,16 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using Bb.Core;
+using Bb.Core.Documents;
+using System;
+using System.Diagnostics;
 
 namespace Bb.Workflow.Service.Models
 {
 
 
     /// <summary>
-    /// 
+    /// MdlConfigurationWkDomainVersionFile
     /// </summary>
-    public class MdlConfigurationWkDomainVersionFileByType
-    {
-
-        /// <summary>
-        /// Initializes a new instance of the <see cref="MdlConfigurationWkDomainVersionFileByType"/> class.
-        /// </summary>
-        public MdlConfigurationWkDomainVersionFileByType()
-        {
-            Files = new List<MdlConfigurationWkDomainVersionFile>();
-        }
-
-        /// <summary>
-        /// Gets the type.
-        /// </summary>
-        /// <value>
-        /// The type.
-        /// </value>
-        public string Type { get; internal set; }
-
-        /// <summary>
-        /// Gets the files.
-        /// </summary>
-        /// <value>
-        /// The files.
-        /// </value>
-        public List<MdlConfigurationWkDomainVersionFile> Files { get; }
-
-    }
-
+    [DebuggerDisplay("ver : {Name}")]
     public class MdlConfigurationWkDomainVersionFile
     {
 
@@ -47,10 +21,45 @@ namespace Bb.Workflow.Service.Models
         /// The name.
         /// </value>
         public string Name { get; internal set; }
+        /// <summary>
+        /// Gets the type.
+        /// </summary>
+        /// <value>
+        /// The type.
+        /// </value>
         public string Type { get; internal set; }
+
+        /// <summary>
+        /// Gets the path.
+        /// </summary>
+        /// <value>
+        /// The path.
+        /// </value>
         public string[] Path { get; internal set; }
-        public DateTime CreationDate { get; internal set; }
-        public DateTime LastUpdate { get; internal set; }
+
+        /// <summary>
+        /// Gets the creation date.
+        /// </summary>
+        /// <value>
+        /// The creation date.
+        /// </value>
+        public DateTimeOffset CreationDate { get; internal set; }
+
+        /// <summary>
+        /// Gets the last update.
+        /// </summary>
+        /// <value>
+        /// The last update.
+        /// </value>
+        public DateTimeOffset LastUpdate { get; internal set; }
+
+        /// <summary>
+        /// Gets the type configuration.
+        /// </summary>
+        /// <value>
+        /// The type configuration.
+        /// </value>
+        public TypeConfiguration TypeConfiguration { get; internal set; }
 
     }
 

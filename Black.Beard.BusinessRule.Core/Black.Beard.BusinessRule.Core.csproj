@@ -19,10 +19,6 @@
   </ItemGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
-  </ItemGroup>
-
-  <ItemGroup>
     <ProjectReference Include="..\Black.Beard.BusinessRule.Models\Black.Beard.BusinessRule.Models.csproj" />
     <ProjectReference Include="..\Black.Beard.Compiler\Black.Beard.Compilers.csproj" />
     <ProjectReference Include="..\Black.Beard.Core\Black.Beard.Core.csproj" />

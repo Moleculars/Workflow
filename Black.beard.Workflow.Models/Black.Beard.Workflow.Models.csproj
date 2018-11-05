@@ -6,7 +6,9 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json" Version="11.0.2" />
+    <Compile Remove="Models\StateConfigs\**" />
+    <EmbeddedResource Remove="Models\StateConfigs\**" />
+    <None Remove="Models\StateConfigs\**" />
   </ItemGroup>
 
   <ItemGroup>

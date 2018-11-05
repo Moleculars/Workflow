@@ -1,6 +1,4 @@
-﻿using Bb.Compilers.Exceptions;
-using Bb.Workflow.Configurations.IncomingMessages;
-using Microsoft.CodeAnalysis;
+﻿using Microsoft.CodeAnalysis;
 using Microsoft.CodeAnalysis.CSharp;
 using Microsoft.CSharp;
 using System;
@@ -16,15 +14,15 @@ using System.Text;
 namespace Bb.Compilers.Pocos
 {
 
-    public class PocoCodeGenerator
+    internal class PocoCodeGenerator
     {
 
 
-        public PocoCodeGenerator(params Assembly[] assemblies)
+        internal PocoCodeGenerator(HashSet<Assembly> assemblies)
         {
 
-            var assembliesToIntegrate = new HashSet<Assembly>(assemblies);
-            assembliesToIntegrate.Add(typeof(System.Object).Assembly);
+            assemblies.Add(typeof(System.Object).Assembly);
+            assemblies.Add(typeof(System.ComponentModel.DescriptionAttribute).Assembly);
 
             var ass = new string[] { "netstandard", "mscorlib", "System.Runtime" };
 
@@ -32,11 +30,11 @@ namespace Bb.Compilers.Pocos
             {
                 var a = item.ResolveAssemblyByName();
                 if (a != null)
-                    assembliesToIntegrate.Add(a);
+                    assemblies.Add(a);
             }
 
             _defaultReferences = new List<MetadataReference>();
-            foreach (Assembly assembly in assembliesToIntegrate)
+            foreach (Assembly assembly in assemblies)
             {
                 var newReference = AssemblyMetadata.CreateFromFile(assembly.Location).GetReference();
                 _defaultReferences.Add(newReference);
@@ -54,8 +52,8 @@ namespace Bb.Compilers.Pocos
             AssemblyResult result = GetAssemblyResult(outputPah, namespaceName);
 
             CodeNamespace ns = new CodeNamespace(namespaceName);
-            GenerateUsing(repository, ns);
             GenerateModels(repository, crc, ns);
+            GenerateUsing(repository, ns);
 
             var code = GenerateCode(ns);
 
@@ -65,7 +63,7 @@ namespace Bb.Compilers.Pocos
 
             var parsedSyntaxTree = Parse(code, result);
 
-            CSharpCompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(Microsoft.CodeAnalysis.OutputKind.DynamicallyLinkedLibrary)
+            CSharpCompilationOptions DefaultCompilationOptions = new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)
                     .WithOverflowChecks(true)
 
                     .WithOptimizationLevel(System.Diagnostics.Debugger.IsAttached
@@ -103,25 +101,22 @@ namespace Bb.Compilers.Pocos
                             Diagnostics = string.Join(", ", diags),
                         });
 
+                    // Map diagnostic for not reference roslyn outsite this assembly
                     foreach (Diagnostic diagnostic in resultEmit.Diagnostics)
-                        result.Disgnostics.Add(diagnostic.ToString());
+                        result.Disgnostics.Add(diagnostic.Map());
 
                     result.Success = resultEmit.Success;
 
-                    if (!resultEmit.Success)
-                    {
-
-                        if (System.Diagnostics.Debugger.IsAttached)
-                            System.Diagnostics.Debugger.Break();
-
-                        throw new Exception("failed to generate");
-                    }
+                    if (!resultEmit.Success && System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
 
                 }
 
             }
             catch (Exception ex)
             {
+
+                result.Excepton = ex;
 
                 if (System.Diagnostics.Debugger.IsAttached)
                     System.Diagnostics.Debugger.Break();
@@ -185,10 +180,35 @@ namespace Bb.Compilers.Pocos
                     IsClass = true,
                 };
 
+                if (!string.IsNullOrEmpty(poco.Description))
+                {
+                    type.Comments.Add(new CodeCommentStatement("<summary>", true));
+                    type.Comments.Add(new CodeCommentStatement(poco.Description, true));
+                    type.Comments.Add(new CodeCommentStatement("</summary>", true));
+                    new System.ComponentModel.DescriptionAttribute(poco.Description);
+
+                    repository.Usings.Add("System.ComponentModel");
+
+                    AppendAttribute(
+                    type.CustomAttributes,
+                    Attribute(nameof(System.ComponentModel.DescriptionAttribute),
+                        new PocoModelAttributeArgument()
+                        {
+                            Value = poco.Description,
+                            IsString = true
+                        })
+                    );
+                }
+
                 AppendAttributes(poco.Attributes, type.CustomAttributes);
 
                 if (!string.IsNullOrEmpty(poco.BaseName))
-                    type.BaseTypes.Add(poco.BaseName);
+                {
+                    if (repository.Pocos.Any(c => c.Name == poco.BaseName))
+                        type.BaseTypes.Add($"{poco.BaseName}_{crc}");
+                    else
+                        type.BaseTypes.Add(poco.BaseName);
+                }
 
                 foreach (var _interface in poco.Interfaces)
                     type.BaseTypes.Add(_interface);
@@ -204,26 +224,28 @@ namespace Bb.Compilers.Pocos
         {
 
             foreach (PocoModelAttribute attribute in attributes)
+                AppendAttribute(target, attribute);
+
+        }
+
+        private static void AppendAttribute(CodeAttributeDeclarationCollection target, PocoModelAttribute attribute)
+        {
+            var _attribute = new CodeAttributeDeclaration(attribute.Name);
+            foreach (PocoModelAttributeArgument arg in attribute.Arguments)
             {
-                var _attribute = new CodeAttributeDeclaration(attribute.Name);
-                foreach (PocoModelAttributeArgument arg in attribute.Arguments)
+
+                var v = arg.IsString
+                        ? new CodePrimitiveExpression(arg.Value)
+                        : (CodeExpression)new CodeSnippetExpression(arg.Value);
+
+                _attribute.Arguments.Add(new CodeAttributeArgument()
                 {
-
-                    var v = arg.IsString
-                            ? new CodePrimitiveExpression(arg.Value)
-                            : (CodeExpression)new CodeSnippetExpression(arg.Value);
-
-                    _attribute.Arguments.Add(new CodeAttributeArgument()
-                    {
-                        Name = arg.Name,
-                        Value = v
-                    });
-                }
-
-                target.Add(_attribute);
-
+                    Name = arg.Name,
+                    Value = v
+                });
             }
 
+            target.Add(_attribute);
         }
 
         private static StringBuilder GenerateCode(CodeNamespace ns)
@@ -260,6 +282,20 @@ namespace Bb.Compilers.Pocos
 
         }
 
+        private static PocoModelAttribute Attribute(string name, params PocoModelAttributeArgument[] args)
+        {
+
+            if (name.EndsWith("Attribute"))
+                name = name.Substring(0, name.Length - 9);
+
+            return new PocoModelAttribute()
+            {
+                Name = name,
+                Arguments = new PocoModelAttributeArguments(args)
+            };
+
+        }
+
         private static void GenerateProperty(PocoModelRepository repository, string crc, PocoModel poco, CodeTypeDeclaration type, PocoProperty property)
         {
 
@@ -271,6 +307,23 @@ namespace Bb.Compilers.Pocos
                 Name = property.Name,
                 Type = tt,
             };
+
+            if (!string.IsNullOrEmpty(property.Description))
+            {
+                _property.Comments.Add(new CodeCommentStatement(property.Description, true));
+                new System.ComponentModel.DescriptionAttribute(property.Description);
+
+                repository.Usings.Add("System.ComponentModel");
+                AppendAttribute(
+                    _property.CustomAttributes,
+                    Attribute(nameof(System.ComponentModel.DescriptionAttribute),
+                    new PocoModelAttributeArgument()
+                    {
+                        Value = property.Description,
+                        IsString = true
+                    })
+                );
+            }
 
             AppendAttributes(property.Attributes, _property.CustomAttributes);
 
@@ -295,7 +348,9 @@ namespace Bb.Compilers.Pocos
             {
                 var typeRef = Type.GetType(propertyType);
                 if (typeRef == null)
-                    throw new Exception($"{propertyType} can't be resolved in {poco.Name}.{property.Name}");
+                {
+                    //     throw new Exception($"{propertyType} can't be resolved in {poco.Name}.{property.Name}");
+                }
             }
             else
                 propertyType = $"{propertyType}_{crc}";
@@ -303,7 +358,9 @@ namespace Bb.Compilers.Pocos
             var tt = property.IsArray
                     ? new CodeTypeReference(new CodeTypeReference(propertyType), 1)
                     : new CodeTypeReference(propertyType);
+
             return tt;
+
         }
 
         private static readonly string runtimePath = Path.Combine(System.Runtime.InteropServices.RuntimeEnvironment.GetRuntimeDirectory(), "{0}.dll");

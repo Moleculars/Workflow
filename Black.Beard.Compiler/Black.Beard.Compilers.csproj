@@ -12,6 +12,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Black.Beard.Compilers.Models\Black.Beard.Compilers.Models.csproj" />
     <ProjectReference Include="..\Black.Beard.Core\Black.Beard.Core.csproj" />
   </ItemGroup>
 

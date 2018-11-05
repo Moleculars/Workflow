@@ -3,8 +3,10 @@ using Newtonsoft.Json;
 using System;
 using System.Text;
 
-namespace Bb.Workflow.Configurations.IncomingMessages
+namespace Bb.Compilers.Pocos
 {
+
+    [System.Diagnostics.DebuggerDisplay("{Type} {Name}")]
     public class PocoProperty
     {
 

@@ -32,12 +32,12 @@ namespace Bb.Workflow.Models
         /// <summary>
         /// Date of the post
         /// </summary>
-        public DateTime PostDate { get; set; }
+        public DateTimeOffset PostDate { get; set; }
 
         /// <summary>
         /// Date of the event
         /// </summary>
-        public DateTime EventDate { get; set; }
+        public DateTimeOffset EventDate { get; set; }
 
         public JObject Object { get; set; }
 

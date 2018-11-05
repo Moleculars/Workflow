@@ -4,30 +4,25 @@
         <name>Black.Beard.Workflow.Service</name>
     </assembly>
     <members>
-        <member name="T:Bb.Workflow.Service.Configurations.ConfigurationExtensions">
+        <member name="T:Bb.Workflow.Service.Configurations.ConfigurationLocalStorageExtensions">
             <summary>
             translate configuration for the website
             </summary>
         </member>
-        <member name="F:Bb.Workflow.Service.Configurations.ConfigurationExtensions.AvailableExtensions">
-            <summary>
-            The available extensions
-            </summary>
-        </member>
-        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationExtensions.InitializeLocalStorageWorkflowConfiguration(Bb.Workflow.Service.Configurations.HostContextBuilder)">
+        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationLocalStorageExtensions.InitializeLocalStorageWorkflowConfiguration(Bb.Workflow.Service.Configurations.HostContextBuilder)">
             <summary>
             Initialize configuration workflow using local storage
             </summary>
             <param name="hostContextBuilder"></param>
             <returns></returns>
         </member>
-        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationExtensions.BuildProcessor(System.String)">
+        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationLocalStorageExtensions.BuildProcessor(System.String)">
             <summary>
             Fournit un environement d'évaluation de workflow
             </summary>
             <returns></returns>
         </member>
-        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationExtensions.RegisterWorkflowConfiguration(Bb.Workflow.Service.Configurations.HostContextBuilder,Microsoft.Extensions.DependencyInjection.IServiceCollection)">
+        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationLocalStorageExtensions.RegisterWorkflowConfiguration(Bb.Workflow.Service.Configurations.HostContextBuilder,Microsoft.Extensions.DependencyInjection.IServiceCollection)">
             <summary>
             register configuration by filename in IOC of web service .net core
             </summary>
@@ -141,6 +136,31 @@
             </summary>
             <returns></returns>
         </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.DeleteFile(System.String,System.String,System.String,System.String)">
+            <summary>
+            Adds the file.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.EditFile(System.String,System.String,System.String,System.String)">
+            <summary>
+            Adds the file.
+            </summary>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.SaveFile(Bb.Workflow.Service.Models.MdlIncomingFileEditor)">
+            <summary>
+            save the file.
+            </summary>
+            <param name="form">The form.</param>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Controllers.ConfigurationController.CompileVersion(System.String,System.String)">
+            <summary>
+            Compile the version.
+            </summary>
+            <returns></returns>
+        </member>
         <member name="T:Bb.Workflow.Service.Controllers.EnvironmentController">
             <summary>
             Provide the of all routes of the site
@@ -224,7 +244,7 @@
             <param name="self">The self.</param>
             <returns></returns>
         </member>
-        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Maps(System.Collections.Generic.IEnumerable{Bb.Workflow.IDomainConfiguration},System.String,System.String)">
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Maps(System.Collections.Generic.IEnumerable{Bb.Core.Documents.IDomainConfiguration},System.String,System.String)">
             <summary>
             Map IEnumerable of domain
             </summary>
@@ -233,7 +253,7 @@
             <param name="_version">The version.</param>
             <returns></returns>
         </member>
-        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Map(Bb.Workflow.IDomainConfiguration,System.Boolean,System.String)">
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Map(Bb.Core.Documents.IDomainConfiguration,System.Boolean,System.String)">
             <summary>
             Map one domain
             </summary>
@@ -242,18 +262,26 @@
             <param name="_version">The version.</param>
             <returns></returns>
         </member>
-        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Map(Bb.Workflow.IConfigurationVersion)">
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.Map(Bb.Core.Documents.IConfigurationVersion)">
             <summary>
             Map IEnumerable
             </summary>
             <param name="version"></param>
             <returns></returns>
         </member>
-        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.MapWithFiles(Bb.Workflow.IConfigurationVersion)">
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.MapWithFiles(Bb.Core.Documents.IConfigurationVersion)">
             <summary>
-            Map IEnumerable
+            Map IConfigurationVersion in model for site
             </summary>
             <param name="version"></param>
+            <returns></returns>
+        </member>
+        <member name="M:Bb.Workflow.Service.Models.Maps.MdlConfigurationWkDomainExtensions.GetList(System.Collections.Generic.Dictionary{System.String,Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType},Bb.Core.Documents.TypeConfiguration)">
+            <summary>
+            Gets the list of files grouped by type of file.
+            </summary>
+            <param name="_dic">The dic.</param>
+            <param name="type">The type.</param>
             <returns></returns>
         </member>
         <member name="T:Bb.Workflow.Service.Models.Maps.ModelContextExtensions">
@@ -330,9 +358,62 @@
             The files.
             </value>
         </member>
+        <member name="T:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile">
+            <summary>
+            MdlConfigurationWkDomainVersionFile
+            </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile.Name">
+            <summary>
+            Gets the name.
+            </summary>
+            <value>
+            The name.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile.Type">
+            <summary>
+            Gets the type.
+            </summary>
+            <value>
+            The type.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile.Path">
+            <summary>
+            Gets the path.
+            </summary>
+            <value>
+            The path.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile.CreationDate">
+            <summary>
+            Gets the creation date.
+            </summary>
+            <value>
+            The creation date.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile.LastUpdate">
+            <summary>
+            Gets the last update.
+            </summary>
+            <value>
+            The last update.
+            </value>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile.TypeConfiguration">
+            <summary>
+            Gets the type configuration.
+            </summary>
+            <value>
+            The type configuration.
+            </value>
+        </member>
         <member name="T:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType">
             <summary>
-            
+            MdlConfigurationWkDomainVersionFileByType
             </summary>
         </member>
         <member name="M:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType.#ctor">
@@ -356,18 +437,26 @@
             The files.
             </value>
         </member>
-        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFile.Name">
+        <member name="P:Bb.Workflow.Service.Models.MdlConfigurationWkDomainVersionFileByType.ConfigurationType">
             <summary>
-            Gets the name.
+            Gets the type of the configuration.
             </summary>
             <value>
-            The name.
+            The type of the configuration.
             </value>
         </member>
         <member name="T:Bb.Workflow.Service.Models.MdlIncomingFileEditor">
             <summary>
             provide a model for editing names (domain, version, ...)
             </summary>
+        </member>
+        <member name="P:Bb.Workflow.Service.Models.MdlIncomingFileEditor.Name">
+            <summary>
+            Gets or sets the name.
+            </summary>
+            <value>
+            The name.
+            </value>
         </member>
         <member name="P:Bb.Workflow.Service.Models.MdlIncomingFileEditor.ModelContent">
             <summary>

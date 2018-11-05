@@ -7,7 +7,7 @@ namespace Bb.Core
 
         public Guid Uid { get; set; }
 
-        public DateTime IntegratedAt { get; set; }
+        public DateTimeOffset IntegratedAt { get; set; }
 
         /// <summary>
         /// Initiale state before integration of last event
@@ -22,11 +22,11 @@ namespace Bb.Core
         /// <summary>
         /// date where the event is provided
         /// </summary>
-        public DateTime TransitionChangedAt { get; set; }
+        public DateTimeOffset TransitionChangedAt { get; set; }
 
-        public DateTime EventDate { get; set; }
+        public DateTimeOffset EventDate { get; set; }
 
-        public DateTime PostDate { get; set; }
+        public DateTimeOffset PostDate { get; set; }
 
         /// <summary>
         /// The key that must matching with config event key

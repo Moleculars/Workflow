@@ -6,10 +6,10 @@
     var ctx = ViewData.Resolve<ConfigurationModelContext>();
 }
 
-<div class="col-md-3">
+<div class="col-md-4">
     <ul>
         <li>
-            Domains&nbsp;<a href="@Url.RouteUrl("AddDomain", new { selectDomain = ctx?.SelectedDomain, selectVersion = ctx?.SelectedVersion })">Add Domain</a>
+            Domains&nbsp;<a href="@Url.RouteUrl("AddDomain", new { selectDomain = ctx?.SelectedDomain, selectVersion = ctx?.SelectedVersion })"><img src="~/images/add_item.png" alt="Add Domain" /></a>
 
             <ul>
                 @if (ctx != null)
@@ -22,7 +22,7 @@
 
                             <ul>
                                 <li>
-                                    Versions&nbsp;<a href="@Url.RouteUrl("AddVersion", new { domain = domain.Name, selectedDomain = ctx.SelectedDomain, selectedVersion = ctx.SelectedVersion })">Add version</a>
+                                    Versions&nbsp;<a href="@Url.RouteUrl("AddVersion", new { domain = domain.Name, selectedDomain = ctx.SelectedDomain, selectedVersion = ctx.SelectedVersion })"><img src="~/images/add_item.png" alt="Add version" /></a>
                                     <ul>
 
                                         @foreach (var version in domain.Versions)
@@ -38,26 +38,27 @@
 
                                             @if (!string.IsNullOrEmpty(cls))
                                             {
-
-                                                <b>@version.Name</b>
-
+                                                <b>@version.Name&nbsp;</b><a href="@Url.RouteUrl("CompileVersion", new { domain = domain.Name, version = version.Name })"><img src="~/images/Compile-Run.png" alt="Add version" /></a>
                                             }
                                             else
                                             {
-                                                <a href="@Url.RouteUrl("IndexConfigurations", new { domain = domain.Name, version = version.Name })">@version.Name</a>
-
+                                                <a href="@Url.RouteUrl("IndexConfigurations", new { domain = domain.Name, version = version.Name })">@version.Name</a> 
+                                                <a href="@Url.RouteUrl("CompileVersion", new { domain = domain.Name, version = version.Name })"><img src="~/images/Compile-Run.png" /></a>
                                             }
 
                                             @foreach (MdlConfigurationWkDomainVersionFileByType type in version.Types)
                                             {
                                                 <ul>
                                                     <li>
-                                                        @type.Type&nbsp;<a href="@Url.RouteUrl("AddFile", new { domain = domain.Name, version = version.Name, type = type.Type })">Add file</a>
+                                                        @type.ConfigurationType.Name&nbsp;<a href="@Url.RouteUrl("AddFile", new { domain = domain.Name, version = version.Name, type = type.Type })"><img src="~/images/Doc-Add.png" alt="Add file" /></a>
 
                                                         <ul>
                                                             @foreach (MdlConfigurationWkDomainVersionFile file in type.Files)
                                                             {
-                                                                <li>@file.Name</li>
+                                                                <li>
+                                                                    <a href="@Url.RouteUrl("EditFile", new { domain = domain.Name, version = version.Name, type = type.Type, name = @file.Name })">@file.Name</a>&nbsp;
+                                                                    <a href="@Url.RouteUrl("DeleteFile", new { domain = domain.Name, version = version.Name, type = type.Type, name = @file.Name })"><img src="~/images/delete.png" /></a>
+                                                                </li>
                                                             }
                                                         </ul>
                                                     </li>

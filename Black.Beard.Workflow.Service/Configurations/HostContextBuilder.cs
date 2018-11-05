@@ -1,4 +1,6 @@
-﻿using System;
+﻿using Bb.Core;
+using Bb.Core.Documents;
+using System;
 
 namespace Bb.Workflow.Service.Configurations
 {
@@ -60,6 +62,8 @@ namespace Bb.Workflow.Service.Configurations
         /// Workflow configuration
         /// </summary>
         public IConfigurationProvider WorkflowConfiguration { get; internal set; }
+
+
 
     }
 

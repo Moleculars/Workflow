@@ -1,27 +1,24 @@
-﻿using System.Collections.Generic;
+﻿using Bb.Core.Documents;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 
-namespace Bb.Workflow.Service.Configurations.Documents.Files
+namespace Bb.Workflow.Configurations.Documents.Files
 {
-    public class LocalStorageDomainConfiguration : IDomainConfiguration
+
+    public class LocalStorageDomainConfiguration : MemoryDomainConfiguration
     {
 
         public LocalStorageDomainConfiguration(IConfigurationProvider configurationProvider, string name, string path)
+            : base (configurationProvider, name)
         {
-            Parent = configurationProvider;
-            Name = name;
-            _items = new Dictionary<string, LocalStorageConfigurationVersion>();
             Folder = new DirectoryInfo(path);
         }
-
-        public IConfigurationProvider Parent { get; }
-
-        public string Name { get; set; }
 
         public DirectoryInfo Folder { get; private set; }
 
 
-        public bool CreateVersionConfiguration(string name)
+        public override bool CreateVersionConfiguration(string name)
         {
 
             Folder.Refresh();
@@ -34,7 +31,7 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
             }
             catch (System.Exception ex)
             {
-
+                Trace.WriteLine(ex);
                 throw;
             }
 
@@ -77,13 +74,13 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
 
         }
 
-        public IEnumerable<IConfigurationVersion> GetVersions()
+        public override IEnumerable<IConfigurationVersion> GetVersions()
         {
             foreach (LocalStorageConfigurationVersion version in _items.Values)
                 yield return version;
         }
 
-        public IConfigurationVersion GetVersion(string version)
+        public override IConfigurationVersion GetVersion(string version)
         {
             if (_items.TryGetValue(version, out LocalStorageConfigurationVersion vers))
                 return vers;
@@ -91,8 +88,6 @@ namespace Bb.Workflow.Service.Configurations.Documents.Files
             return null;
 
         }
-
-        private readonly Dictionary<string, LocalStorageConfigurationVersion> _items;
 
     }
 

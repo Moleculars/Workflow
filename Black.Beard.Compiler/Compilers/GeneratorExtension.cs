@@ -1,5 +1,7 @@
 ﻿using Bb.Compilers.Exceptions;
+using Bb.Compilers.Pocos;
 using Microsoft.CodeAnalysis;
+using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 
@@ -8,6 +10,58 @@ namespace Bb.Compilers
 
     public static class GeneratorExtension
     {
+
+
+        public static DiagnosticResult Map(this Diagnostic self)
+        {
+
+            return new DiagnosticResult()
+            {
+                Locations = GetLocations(self),
+                Id = self.Id,
+                Message = self.GetMessage(),
+                IsWarningAsError = self.IsWarningAsError,
+                Severity = self.Severity.ToString(),
+                WarningLevel = self.WarningLevel,
+            };
+            
+        }
+
+        private static List<LocationResult> GetLocations(Diagnostic self)
+        {
+
+            List<LocationResult> result = new List<LocationResult>(self.AdditionalLocations.Count + 1)
+            {
+                Map(self.Location)
+            };
+
+            foreach (var item in self.AdditionalLocations)
+                result.Add(Map(item));
+
+            return result;
+
+        }
+
+        private static LocationResult Map(Location location)
+        {
+
+            var lineSpan = location.GetLineSpan();
+            return new LocationResult()
+            {
+                FilePath = location.SourceTree.FilePath,
+
+                StartCharacter = location.SourceSpan.Start,
+                StartLine = lineSpan.StartLinePosition.Line,
+                StartColumn = lineSpan.StartLinePosition.Character,
+
+                EndCharacter = location.SourceSpan.End,
+                EndLine = lineSpan.EndLinePosition.Line,
+                EndColumn = lineSpan.EndLinePosition.Character,
+
+            };
+
+        }
+
 
         /// <summary>
         /// emit the compilation result into a byte array 

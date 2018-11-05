@@ -3,8 +3,9 @@ using Bb.BusinessRule.Core.Configurations;
 using Bb.BusinessRule.Models;
 using Bb.BusinessRule.Parser;
 using Bb.BusinessRule.Parser.Grammar;
+using Bb.Compilers.Models;
+using Bb.Compilers.Pocos;
 using Bb.ComponentModel.Attributes;
-using Bb.Workflow.Configurations.IncomingMessages;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
 using System.Collections.Generic;
@@ -45,11 +46,12 @@ namespace Bb.BusinessRule.Tests
 	]
 }");
             var rep = new PocoModelRepository("t1");
-            txt.DeserializeIncomingConfigModel().Convert(rep, "myDom", "myVer");
+            CompilerModelRoot.Load(txt)
+                .Append(rep, "myDomain", "myVersion");
 
             var path = Path.Combine(Path.GetTempPath(), Path.GetFileNameWithoutExtension(Path.GetTempFileName()));
 
-            var resultAssembly = rep.Compile(path);
+            var resultAssembly = rep.Generate(path);
 
             var ass = resultAssembly.Load();
 
@@ -59,8 +61,9 @@ namespace Bb.BusinessRule.Tests
 
             instance.Id = "test";
 
-        }
+            Assert.AreEqual(instance.Id, "test");
 
+        }
 
         [TestMethod]
         public void TestMethod1()

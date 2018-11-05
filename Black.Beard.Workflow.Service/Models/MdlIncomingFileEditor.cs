@@ -17,6 +17,20 @@ namespace Bb.Workflow.Service.Models
     public class MdlIncomingFileEditor
     {
 
+                /// <summary>
+        /// Gets or sets the name.
+        /// </summary>
+        /// <value>
+        /// The name.
+        /// </value>
+        [Required(ErrorMessage = "This argument is required")]
+        [DisplayName("Name")]
+        [Description("Write the name of the new item here")]
+        [RegularExpression(@"\w+")]
+        [StringLength(50, ErrorMessage ="this argument must be less than {1} characters")]
+        [MinLength(3,  ErrorMessage ="this argument must be great than {1} characters")]
+        public string Name { get; set; }
+
         /// <summary>
         /// Gets or sets the name.
         /// </summary>
@@ -62,6 +76,9 @@ namespace Bb.Workflow.Service.Models
         /// </value>
         public string Type { get; set; }
         
+        public string OldName { get; set; }
+
+
     }
 
 }

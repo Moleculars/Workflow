@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Reflection;
 
 namespace Bb.Compilers.Pocos
@@ -8,7 +9,7 @@ namespace Bb.Compilers.Pocos
 
         public AssemblyResult()
         {
-            Disgnostics = new List<string>();
+            Disgnostics = new List<DiagnosticResult>();
         }
 
         public string AssemblyName { get; internal set; }
@@ -19,8 +20,9 @@ namespace Bb.Compilers.Pocos
 
         public string AssemblyFilePdb { get; internal set; }
 
-        public List<string> Disgnostics { get; internal set; }
+        public List<DiagnosticResult> Disgnostics { get; internal set; }
         public bool Success { get; internal set; }
+        public Exception Excepton { get; internal set; }
 
         public Assembly Load()
         {

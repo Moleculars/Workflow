@@ -11,7 +11,7 @@ namespace Bb.Logs
         public string Identity { get; internal set; }
         public string UserName { get; internal set; }
         public string Domain { get; internal set; }
-        public DateTime TimeStampUtc { get; internal set; }
+        public DateTimeOffset TimeStampUtc { get; internal set; }
         public string LoggerName { get; internal set; }
         public string ThreadName { get; internal set; }
         public string Message { get; internal set; }

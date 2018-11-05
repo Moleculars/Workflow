@@ -1,5 +1,6 @@
 ﻿using Bb.BusinessRule.Models;
 using Bb.Core;
+using Bb.Core.Helpers;
 using Bb.Core.LocalQueue;
 using Bb.Workflow;
 using Bb.Workflow.Configurations;
@@ -121,7 +122,7 @@ namespace Bb
                 Uid = @event.Uid,
                 Key = @event.Key,
                 EventDate = @event.EventDate,
-                IntegratedAt = DateTime.UtcNow,
+                IntegratedAt = LocalClock.GetNow,
 
                 PostDate = @event.PostDate,
 

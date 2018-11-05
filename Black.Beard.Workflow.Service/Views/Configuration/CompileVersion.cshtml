@@ -1,0 +1,46 @@
+﻿@model Bb.Core.Documents.ConfigurationCompileResult
+
+@{
+    var ctx = ViewData.Resolve<ConfigurationModelContext>();
+    await Html.RenderPartialAsync(@"TreeConfiguration.cshtml", ViewData);
+    var assemblyComiler = @Model?.AssemblyCompiler as Bb.Compilers.Pocos.AssemblyResult;
+}
+
+<h2>Compilation result for the domain @Model?.Domain, version @Model?.Version </h2>
+
+<div class="col-md-8">
+
+    <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+
+    @if (assemblyComiler != null)
+    {
+
+        @if (!assemblyComiler.Success)
+        {
+        <div>Failed to compile configuration</div>
+        }
+        else
+        {
+        <div>Successfull to compile configuration</div>
+        }
+
+        @foreach (var item in assemblyComiler.Disgnostics)
+        {
+        <div>
+
+            <div>
+                <b>@item.Severity</b>&nbsp;@item.Message
+                @foreach(var item2 in item.Locations)
+                        {
+                <b>@item2.ToString()</b>
+                        }
+
+            </div>
+
+        </div>
+        }
+
+    }
+
+</div>
+
