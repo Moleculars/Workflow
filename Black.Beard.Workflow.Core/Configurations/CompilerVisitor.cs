@@ -18,11 +18,17 @@ namespace Bb.Workflow.Configurations
         public override object Visit(CompilerModelRoot root)
         {
 
-            root.BaseName = "WorkflowModel";
+            if (root.BaseName == "State")
+                root.BaseName = "WorkflowModel";
+
+            else if (root.BaseName == "Event")
+                root.BaseName = "StateEvent";
+
             var result = base.Visit(root);
 
             base._repository.AddUsings(
-                "Bb.Workflow.Models"
+                "Bb.Workflow.Models",
+                "Bb.Core"
             );
 
             return result;

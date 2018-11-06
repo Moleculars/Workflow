@@ -1,5 +1,6 @@
 ﻿namespace Bb.Compilers.Models
 {
+
     public abstract class CompilerBaseVisitor
     {
 

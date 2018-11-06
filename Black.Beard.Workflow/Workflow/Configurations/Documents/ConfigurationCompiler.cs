@@ -4,9 +4,9 @@ using Bb.Core;
 using Bb.Core.Documents;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
-using System.Text;
 
 namespace Bb.Workflow.Configurations.Documents
 {
@@ -14,12 +14,12 @@ namespace Bb.Workflow.Configurations.Documents
     internal class ConfigurationCompiler
     {
 
-        public ConfigurationCompiler(string domain, string version, IEnumerable<IConfigurationDocument>  documents, TypeConfigurations types)
+        public ConfigurationCompiler(string domain, string version, IEnumerable<IConfigurationDocument> documents, TypeConfigurations types)
         {
-            this._domain = domain;
-            this._version = version;
-            this._documents = documents;
-            this._types = types;
+            _domain = domain;
+            _version = version;
+            _documents = documents;
+            _types = types;
         }
 
         /// <summary>
@@ -30,22 +30,24 @@ namespace Bb.Workflow.Configurations.Documents
         public ConfigurationCompileResult Compile()
         {
 
+            bool ok = true;
+
             var configurationCompileResult = new ConfigurationCompileResult()
             {
-                Domain = this._domain,
-                Version = this._version,
+                Domain = _domain,
+                Version = _version,
             };
 
             PocoModelRepository repository = new PocoModelRepository(configurationCompileResult.Domain);
             repository.AddUsings(typeof(ISourceEvent), typeof(ExposeIncomingMessage));      // Add using & references for incomingModel
             repository.AddUsings(typeof(Models.WorkflowModel), typeof(IWorkflowState));     // Add using & references for workflow state model
-            
-            CompileContext ctx = new CompileContext(configurationCompileResult.Domain, this._version)
+
+            CompileContext ctx = new CompileContext(configurationCompileResult.Domain, _version)
             {
                 Repository = repository,
             };
 
-            var documents = this._documents.ToLookup(c => c.TypeConfiguration.Extension);
+            var documents = _documents.ToLookup(c => c.TypeConfiguration.Extension);
             foreach (var type in _types)
             {
 
@@ -53,14 +55,24 @@ namespace Bb.Workflow.Configurations.Documents
 
                 if (items.Any())
                 {
-
                     if (type.Compiler == null)
                     {
                         System.Diagnostics.Debugger.Break();
                         throw new NotImplementedException($"compiler {type.Name} not implemented");
                     }
 
-                    type.Compiler.PrepareCompile(items, ctx);
+                    foreach (IConfigurationDocument doc in items)
+                    {
+                        var results = type.Compiler.Check(doc);
+                        if (results.Any())
+                        {
+                            ok = false;
+                            configurationCompileResult.Diagnostics.AddRange(results);
+                        }
+                    }
+
+                    if (ok)
+                        type.Compiler.PrepareCompile(items, ctx);
 
                 }
             }
@@ -68,7 +80,28 @@ namespace Bb.Workflow.Configurations.Documents
             string path = new FileInfo(typeof(PocoModelRepository).Assembly.Location).Directory.FullName;
             string fullname = Path.Combine(path, repository.Filename) + ".dll";
 
-            configurationCompileResult.AssemblyCompiler = repository.Generate(path);
+            if (ok)
+            {
+                var r = repository.Generate(path);
+                configurationCompileResult.AssemblyCompiler = r;
+
+                // translate compile error in checkResult for shown in website
+                foreach (DiagnosticResult diag in r.Disgnostics)
+                    foreach (var item in diag.Locations)
+                        configurationCompileResult.Diagnostics.Add(new CheckResult()
+                        {
+                            LineNumber = item.StartLine,
+                            LinePosition = item.StartColumn,
+                            Document = item.FilePath,
+                            Message = diag.Message,
+                            Severity = diag.Severity,
+                        });
+
+
+            }
+
+            foreach (var item in configurationCompileResult.Diagnostics)
+                Trace.WriteLine(item.ToString());
 
             return configurationCompileResult;
 
@@ -78,6 +111,7 @@ namespace Bb.Workflow.Configurations.Documents
         private readonly string _version;
         private readonly IEnumerable<IConfigurationDocument> _documents;
         private readonly TypeConfigurations _types;
+
     }
 
 }

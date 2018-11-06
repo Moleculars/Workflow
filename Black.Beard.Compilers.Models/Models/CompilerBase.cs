@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Bb.Compilers.Models
+﻿namespace Bb.Compilers.Models
 {
 
     public abstract class CompilerBase
@@ -31,13 +29,16 @@ namespace Bb.Compilers.Models
         /// </value>
         public string Description { get; set; }
 
+
         /// <summary>
         /// Accepts the specified visitor.
         /// </summary>
         /// <param name="visitor">The visitor.</param>
         /// <returns></returns>
         public abstract object Accept(CompilerBaseVisitor visitor);
-        
+
+        public int LineNumber;
+        public int LinePosition;
 
     }
 }

@@ -25,14 +25,33 @@ namespace Bb.Workflow.Configurations
             try
             {
                 var sb = document.Content;
-                var config = CompilerModelRoot.Load(sb);
+                var model = CompilerModelRoot.Load(sb);
+
+                CompilerValidator validator = new CompilerValidator();
+                validator.Visit(model);
+
+                foreach (var item in validator.Dignostics)
+                {
+                    result.Add(new CheckResult()
+                    {
+                        Document = document.Name,
+                        Message = item.Message,
+                        LineNumber = item.LineNumber,
+                        LinePosition = item.LinePosition,
+                        Name = item.Name,
+                        Severity = "Error"
+                    });
+
+                }
+
+
             }
             catch (Exception ex)
             {
 
                 Trace.WriteLine(ex);
 
-                result.Add(new CheckResult() { Document = document, Message = ex.Message });
+                result.Add(new CheckResult() { Document = document.Name, Message = ex.Message });
 
                 if (System.Diagnostics.Debugger.IsAttached)
                     System.Diagnostics.Debugger.Break();

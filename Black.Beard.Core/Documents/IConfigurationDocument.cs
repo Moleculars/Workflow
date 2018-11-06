@@ -55,7 +55,9 @@ namespace Bb.Core.Documents
         /// </summary>
         /// <returns></returns>
         bool Delete();
+
         void Save();
+
     }
 }
 

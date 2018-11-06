@@ -25,14 +25,32 @@ namespace Bb.BusinessRule.Configurations
             try
             {
                 var sb = document.Content;
-                CompilerModelRoot.Load(sb);
+                var model = CompilerModelRoot.Load(sb);
+
+                CompilerValidator validator = new CompilerValidator();
+                validator.Visit(model);
+
+                foreach (var item in validator.Dignostics)
+                {
+                    result.Add(new CheckResult()
+                    {
+                        Document = document.Name,
+                        Message = item.Message,
+                        LineNumber = item.LineNumber,
+                        LinePosition = item.LinePosition,
+                        Name = item.Name,
+                        Severity = "Error"
+                    });
+
+                }
+
             }
             catch (Exception ex)
             {
 
                 Trace.WriteLine(ex);
 
-                result.Add(new CheckResult() { Document = document, Message = ex.Message });
+                result.Add(new CheckResult() { Document = document.Name, Message = ex.Message });
 
                 if (System.Diagnostics.Debugger.IsAttached)
                     System.Diagnostics.Debugger.Break();
@@ -71,17 +89,16 @@ namespace Bb.BusinessRule.Configurations
 
             foreach (var item in documents)
             {
-                var obj = CompilerModelRoot.Load(item.Content);
+                var model = CompilerModelRoot.Load(item.Content);
 
-                CompilerVisitor visitor = new CompilerVisitor(repository,context.Domain, context.Version);
-                visitor.Visit(obj);
-             
-                context.IncomingModels.Add(obj.Name);
+                CompilerVisitor visitor = new CompilerVisitor(repository, context.Domain, context.Version);
+                visitor.Visit(model);
+
+                context.IncomingModels.Add(model.Name);
+
             }
 
-
         }
-
 
     }
 

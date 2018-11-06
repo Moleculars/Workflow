@@ -1,9 +1,13 @@
 ﻿@model Bb.Core.Documents.ConfigurationCompileResult
 
 @{
+
     var ctx = ViewData.Resolve<ConfigurationModelContext>();
     await Html.RenderPartialAsync(@"TreeConfiguration.cshtml", ViewData);
+
     var assemblyComiler = @Model?.AssemblyCompiler as Bb.Compilers.Pocos.AssemblyResult;
+
+    var checks = @Model?.Diagnostics;
 }
 
 <h2>Compilation result for the domain @Model?.Domain, version @Model?.Version </h2>
@@ -17,30 +21,30 @@
 
         @if (!assemblyComiler.Success)
         {
-        <div>Failed to compile configuration</div>
+            <div>Failed to compile configuration</div>
         }
         else
         {
-        <div>Successfull to compile configuration</div>
+            <div>Successfull to compile configuration</div>
         }
-
-        @foreach (var item in assemblyComiler.Disgnostics)
-        {
-        <div>
-
-            <div>
-                <b>@item.Severity</b>&nbsp;@item.Message
-                @foreach(var item2 in item.Locations)
-                        {
-                <b>@item2.ToString()</b>
-                        }
-
-            </div>
-
-        </div>
-        }
-
     }
+    else
+    {
+        <div>Failed to compile configuration</div>
+    }
+
+    @if (checks != null)
+    {
+        @foreach (var item in checks)
+        {
+            <div>
+                <div>
+                    <b>@item.Severity</b>&nbsp;@item.ToString()
+                </div>
+            </div>
+        }
+    }
+
 
 </div>
 

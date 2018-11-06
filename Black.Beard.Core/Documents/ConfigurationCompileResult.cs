@@ -1,7 +1,14 @@
-﻿namespace Bb.Core.Documents
+﻿using System.Collections.Generic;
+
+namespace Bb.Core.Documents
 {
     public class ConfigurationCompileResult
     {
+
+        public ConfigurationCompileResult()
+        {
+            Diagnostics = new List<CheckResult>();
+        }
 
         /// <summary>
         /// Gets or sets the domain.
@@ -26,6 +33,8 @@
         /// <see cref="Bb.Core.CompileResult"/> result of assembly complier
         /// </value>
         public object AssemblyCompiler { get; set; }
+
+        public List<CheckResult> Diagnostics { get; }
 
     }
 

@@ -14,11 +14,8 @@ namespace Bb.Workflow.Configurations
 
         public ConverterVisitor()
         {
-
             this._actions = MethodDiscovery.GetActions<TContext>(true, typeof(bool), typeof(TContext));
-
             this._context = Expression.Parameter(typeof(TContext), "context");
-
         }
 
         private ParameterExpression _context;

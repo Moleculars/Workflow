@@ -356,7 +356,7 @@ namespace Bb.Workflow.Service.Controllers
                         if (string.IsNullOrEmpty(form.OldName))     // alway empty for creation
                             form.OldName = form.Name;
 
-                        _ver.SaveFile(form.Type, form.OldName, new StringBuilder(form.ModelContent));
+                        var results = _ver.SaveFile(form.Type, form.OldName, new StringBuilder(form.ModelContent));
 
                         if (form.OldName != form.Name)
                         {
@@ -365,6 +365,10 @@ namespace Bb.Workflow.Service.Controllers
                                 ModelState.AddModelError("Nmaz", $"Failed to rename the configuration");
 
                         }
+
+                        foreach (CheckResult check in results)
+                            ModelState.AddModelError("ModelContent", check.ToString());
+
                     }
 
                 }
