@@ -36,7 +36,7 @@ namespace Bb.Compilers.Models
         }
 
         /// <summary>
-        /// Deserializes the payload in <see cref="Bb.Workflow.Models.StateConfigs.StateConfigModel"/>.
+        /// Deserializes the payload in <see cref="Bb.Compilers.Models.CompilerModelRoot"/>.
         /// </summary>
         /// <param name="sb">The sb.</param>
         /// <returns></returns>

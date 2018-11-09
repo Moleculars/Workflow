@@ -1,16 +1,15 @@
 ﻿using Bb.Compilers.Models;
 
-namespace Bb.BusinessRule.Configurations
+namespace Bb.Mappings
 {
-    internal class CompilerValidator : ValidateCompilerVisitor
+
+    internal class MappingCompilerValidator : ValidateCompilerVisitor
     {
 
         public override object Visit(CompilerModelRoot root)
         {
             base.Visit(root);
 
-            if (string.IsNullOrEmpty(root.Key))
-                Add(root, "Key", "property key must be Specified");
 
             return null;
 

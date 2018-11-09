@@ -11,40 +11,11 @@ namespace Bb.ComponentModel
     public class TypeDiscovery
     {
 
-        private static volatile object _lock = new object();
-
-        /// <summary>
-        ///     The on register exception
-        /// </summary>
-        public static Action<Exception> OnRegisterException = e => { };
-
-        /// <summary>
-        ///     The on registration event
-        /// </summary>
-        public static Action<string> OnRegistrationEvent = e => Debug.WriteLine(e);
-
-        /// <summary>
-        ///     function  return the list of loaded assemblies
-        /// </summary>
-        private readonly Func<IEnumerable<Assembly>> Assemblies;
-
-        private readonly DirectoryInfo[] paths;
-
-        /// <summary>
-        ///     define a filter for filter the assemblies to use in the register
-        /// </summary>
-        public Func<Assembly, bool> FilterAssembly;
-
-        /// <summary>
-        ///     The filter fileinfo
-        /// </summary>
-        public Func<FileInfo, bool> FilterFilename;
-
-        public TypeDiscovery(params string[] pluginsPaths)
+        public TypeDiscovery(params string[] paths)
         {
 
-            if (pluginsPaths == null)
-                pluginsPaths = new string[] { };
+            if (paths == null)
+                paths = new string[] { };
 
             ExcludedAssemblies = new List<string>();
             FilterAssembly = c => true;
@@ -60,57 +31,16 @@ namespace Bb.ComponentModel
                 ? FolderBinResolver.GetWebBinPath().ToList()
                 : FolderBinResolver.GetConsoleBinPath().ToList();
 
-            foreach (var _path in pluginsPaths)
+            foreach (var _path in paths)
                 if (!string.IsNullOrEmpty(_path))
                     if (h.Add(_path))
                         dir.Add(new DirectoryInfo(_path));
 
-            paths = dir.Where(c => c.Exists).ToArray();
+            this.paths = dir.Where(c => c.Exists).ToList();
 
             //foreach (var item in paths)
             //    Trace.WriteLine($" the type discover is initialized with path '{item.FullName}'");
 
-        }
-
-        /// <summary>
-        ///     The exclude assemblies
-        /// </summary>
-        public static List<string> ExcludedAssemblies { get; private set; }
-
-        /// <summary>
-        ///     Gets or sets a value indicating whether [hide assembly load exception].
-        /// </summary>
-        /// <value>
-        ///     <c>true</c> if [hide assembly load exception]; otherwise, <c>false</c>.
-        /// </value>
-        public static bool HideAssemblyLoadException { get; set; }
-
-        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
-        {
-            var n = new AssemblyName(args.Name);
-
-            foreach (var baseDirectory in paths)
-            {
-                var fileInfo = baseDirectory.GetFiles(n.Name + ".dll", SearchOption.AllDirectories).FirstOrDefault();
-                if (fileInfo != null)
-                {
-                    var assembly = Assembly.LoadFile(fileInfo.FullName);
-                    return assembly;
-                }
-                fileInfo = baseDirectory.GetFiles(n.Name + ".exe").FirstOrDefault();
-                if (fileInfo != null)
-                {
-                    var assembly = Assembly.LoadFile(fileInfo.FullName);
-                    return assembly;
-                }
-            }
-
-            var str =
-                $"the assembly '{args.Name}' can't be resolved in the folder '{AppDomain.CurrentDomain.BaseDirectory}'";
-
-            Console.Write(str);
-
-            return null;
         }
 
         /// <summary>
@@ -163,6 +93,24 @@ namespace Bb.ComponentModel
             return result;
         }
 
+        public Type ResolveByName(string targetType)
+        {
+
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+            Type typeResult = null;
+            try
+            {
+                typeResult = Type.GetType(targetType);
+            }
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+            }
+
+            return typeResult;
+
+        }
+
         /// <summary>
         ///     return a list of type that assignable from the specified type
         /// </summary>
@@ -178,6 +126,43 @@ namespace Bb.ComponentModel
             return result;
         }
 
+        /// <summary>
+        /// Add a new directory for search types
+        /// </summary>
+        /// <param name="configuration"></param>
+        public void AddDirectory(DirectoryInfo configuration)
+        {
+            if (!paths.Contains(configuration))
+                paths.Add(configuration);
+        }
+
+        private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
+        {
+            var n = new AssemblyName(args.Name);
+
+            foreach (var baseDirectory in paths)
+            {
+                var fileInfo = baseDirectory.GetFiles(n.Name + ".dll", SearchOption.AllDirectories).FirstOrDefault();
+                if (fileInfo != null)
+                {
+                    var assembly = Assembly.LoadFile(fileInfo.FullName);
+                    return assembly;
+                }
+                fileInfo = baseDirectory.GetFiles(n.Name + ".exe").FirstOrDefault();
+                if (fileInfo != null)
+                {
+                    var assembly = Assembly.LoadFile(fileInfo.FullName);
+                    return assembly;
+                }
+            }
+
+            var str =
+                $"the assembly '{args.Name}' can't be resolved in the folder '{AppDomain.CurrentDomain.BaseDirectory}'";
+
+            Console.Write(str);
+
+            return null;
+        }
 
         /// <summary>
         ///     Load in memory all the assemblies from the directory bin.
@@ -309,5 +294,48 @@ namespace Bb.ComponentModel
             return _r.Where(typeFilter).ToList();
 
         }
+
+        /// <summary>
+        ///     The on register exception
+        /// </summary>
+        public static Action<Exception> OnRegisterException = e => { };
+
+        /// <summary>
+        ///     The on registration event
+        /// </summary>
+        public static Action<string> OnRegistrationEvent = e => Debug.WriteLine(e);
+
+        /// <summary>
+        ///     define a filter for filter the assemblies to use in the register
+        /// </summary>
+        public Func<Assembly, bool> FilterAssembly { get; set; }
+
+        /// <summary>
+        ///     The filter fileinfo
+        /// </summary>
+        public Func<FileInfo, bool> FilterFilename { get; set; }
+
+        /// <summary>
+        ///     The exclude assemblies
+        /// </summary>
+        public static List<string> ExcludedAssemblies { get; private set; }
+
+        /// <summary>
+        ///     Gets or sets a value indicating whether [hide assembly load exception].
+        /// </summary>
+        /// <value>
+        ///     <c>true</c> if [hide assembly load exception]; otherwise, <c>false</c>.
+        /// </value>
+        public static bool HideAssemblyLoadException { get; set; }
+
+
+
+        /// <summary>
+        ///     function  return the list of loaded assemblies
+        /// </summary>
+        private readonly Func<IEnumerable<Assembly>> Assemblies;
+        private readonly List<DirectoryInfo> paths;
+        private static readonly object _lock = new object();
+
     }
 }

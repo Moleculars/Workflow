@@ -18,7 +18,7 @@ namespace Bb.Workflow.Configurations
         /// <param name="version">The version.</param>
         public static void Append(this CompilerModelRoot model, PocoModelRepository repository)
         {
-            var visitor = new CompilerVisitor(repository);
+            var visitor = new StateCompilerVisitor(repository);
             var result = visitor.Visit(model);
         }
     

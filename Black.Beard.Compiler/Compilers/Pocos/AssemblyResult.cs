@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Reflection;
 
 namespace Bb.Compilers.Pocos
@@ -22,10 +23,11 @@ namespace Bb.Compilers.Pocos
 
         public List<DiagnosticResult> Disgnostics { get; internal set; }
         public bool Success { get; internal set; }
-        public Exception Excepton { get; internal set; }
+        public Exception Exception { get; internal set; }
 
         public Assembly Load()
         {
+            Trace.WriteLine($"Loading assembly {AssemblyFile}");
             return Assembly.LoadFile(AssemblyFile);
         }
 

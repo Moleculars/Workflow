@@ -147,7 +147,7 @@ namespace Bb.ComponentModel
         }
 
 
-        private static Assembly GetWebAssembly() => Assembly.LoadWithPartialName("System.Web");
+        private static Assembly GetWebAssembly() => Assembly.LoadWithPartialName("System.Web"); // Microsoft.AspNetCore.App
         private static bool? _isSystemWebAssemblyLoaded;
         private const string _typeBuildManager = "System.Web.Compilation.BuildManager";
         private const string _GetReferencedAssembliesMethodName = "GetReferencedAssemblies";

@@ -42,6 +42,7 @@ namespace Bb.Core.Documents
         public string Extension { get; }
 
         public IConfigurationDocumentCompiler Compiler { get; set; }
+        public bool Precompile { get; set; }
 
         internal void Add(IConfigurationTemplateFile template)
         {

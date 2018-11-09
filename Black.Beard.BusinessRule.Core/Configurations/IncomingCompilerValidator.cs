@@ -1,20 +1,18 @@
 ﻿using Bb.Compilers.Models;
 
-namespace Bb.Workflow.Configurations
+namespace Bb.BusinessRule.Configurations
 {
-    internal class CompilerValidator : ValidateCompilerVisitor
+    internal class IncomingCompilerValidator : ValidateCompilerVisitor
     {
 
         public override object Visit(CompilerModelRoot root)
         {
+            base.Visit(root);
 
             if (string.IsNullOrEmpty(root.Key))
-                Add(root, "Key", "property Key must be Specified");
-            
-            if (root.BaseName != "State" && root.BaseName != "Event")
-                Add(root, "BaseName", "property BaseName is restricted (State, Event)");
-            
-            return base.Visit(root);
+                Add(root, "Key", "property key must be Specified");
+
+            return null;
 
         }
 

@@ -25,7 +25,7 @@ namespace Bb.Workflow.Configurations
         public void Register()
         {
 
-            var _workflowConverterVisitor = new ConverterVisitor<TContext>();
+            var _workflowConverterVisitor = new StateConverterVisitor<TContext>();
 
             bool haveWorkflow = false;
             foreach (StringBuilder content in this.GetContents())

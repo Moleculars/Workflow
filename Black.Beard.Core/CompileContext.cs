@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using Bb.ComponentModel;
 
 namespace Bb.Core
 {
@@ -23,10 +24,13 @@ namespace Bb.Core
 
         public object Repository { get; set; }
 
+        public object RepositoryMapping { get; set; }
+
+        
         public List<string> IncomingModels { get; }
 
         public List<string> StateModels { get; }
 
-
+        public TypeDiscovery TypeResolver { get; set; }
     }
 }

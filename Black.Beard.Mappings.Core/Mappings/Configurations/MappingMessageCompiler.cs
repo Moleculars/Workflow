@@ -1,15 +1,15 @@
 ﻿using Bb.Compilers.Models;
-using Bb.Compilers.Pocos;
 using Bb.Core;
 using Bb.Core.Documents;
+using Bb.Mappings.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 
-namespace Bb.BusinessRule.Configurations
+namespace Bb.Mappings.Configurations
 {
 
-    public class IncomingMessageCompiler : IConfigurationDocumentCompiler
+    public class MappingMessageCompiler : IConfigurationDocumentCompiler
     {
 
         /// <summary>
@@ -27,7 +27,7 @@ namespace Bb.BusinessRule.Configurations
                 var sb = document.Content;
                 var model = CompilerModelRoot.Load(sb);
 
-                IncomingCompilerValidator validator = new IncomingCompilerValidator();
+                MappingCompilerValidator validator = new MappingCompilerValidator();
                 validator.Visit(model);
 
                 foreach (var item in validator.Dignostics)
@@ -85,16 +85,17 @@ namespace Bb.BusinessRule.Configurations
         public void Initialize(IEnumerable<IConfigurationDocument> documents, CompileContext context)
         {
 
-            var repository = (PocoModelRepository)context.Repository;
-
+            var repositoryMappings = (MappingRepository)context.Repository;
+            var typeResolver = context.TypeResolver;
             foreach (var item in documents)
             {
-                var model = CompilerModelRoot.Load(item.Content);
 
-                IncomingCompilerVisitor visitor = new IncomingCompilerVisitor(repository, context.Domain, context.Version);
-                visitor.Visit(model);
+                var model = MappingConfiguration.Load(item.Content);
 
-                context.IncomingModels.Add(model.Name);
+                Type source = typeResolver.ResolveByName(model.SourceType);
+                Type target = typeResolver.ResolveByName(model.TargetType);
+
+                repositoryMappings.Append(model, item.Name, source, target);
 
             }
 

@@ -37,7 +37,7 @@ namespace Bb.Workflow.Configurations.Documents
         /// <exception cref="NotImplementedException">compiler {type.Name}</exception>
         public ConfigurationCompileResult Compile()
         {
-            ConfigurationCompiler compiler = new ConfigurationCompiler(this.Parent.Name, this.Name, this.Documents.ToList(), Parent.Parent.Types);
+            ConfigurationCompiler compiler = new ConfigurationCompiler(this.Parent.Name, this.Name, this.Documents.ToList(), Parent.Parent.Types, Parent.Parent.TypeResolver);
             return compiler.Compile();
         }
 

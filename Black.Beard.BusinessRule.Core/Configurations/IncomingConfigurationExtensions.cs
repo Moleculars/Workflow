@@ -18,7 +18,7 @@ namespace Bb.BusinessRule.Configurations
         /// <param name="version">The version.</param>
         public static void Append(this CompilerModelRoot model, PocoModelRepository repository, string domain, string version)
         {
-            CompilerVisitor visitor = new CompilerVisitor(repository, domain, version);
+            IncomingCompilerVisitor visitor = new IncomingCompilerVisitor(repository, domain, version);
             visitor.Visit(model);
         }
     

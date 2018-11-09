@@ -27,7 +27,7 @@ namespace Bb.Workflow.Configurations
                 var sb = document.Content;
                 var model = CompilerModelRoot.Load(sb);
 
-                CompilerValidator validator = new CompilerValidator();
+                StateCompilerValidator validator = new StateCompilerValidator();
                 validator.Visit(model);
 
                 foreach (var item in validator.Dignostics)
@@ -83,7 +83,7 @@ namespace Bb.Workflow.Configurations
         /// Compiles the specified documents.
         /// </summary>
         /// <param name="documents">The SBS.</param>
-        public void PrepareCompile(IEnumerable<IConfigurationDocument> documents, CompileContext context)
+        public void Initialize(IEnumerable<IConfigurationDocument> documents, CompileContext context)
         {
 
             var repository = (PocoModelRepository)context.Repository;
@@ -93,7 +93,7 @@ namespace Bb.Workflow.Configurations
 
                 var obj = CompilerModelRoot.Load(item.Content);
 
-                var visitor = new CompilerVisitor(repository);
+                var visitor = new StateCompilerVisitor(repository);
                 var result = visitor.Visit(obj);
 
                 context.StateModels.Add(obj.Name);

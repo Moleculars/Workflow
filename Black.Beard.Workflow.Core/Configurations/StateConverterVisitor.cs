@@ -9,10 +9,10 @@ using System.Text;
 namespace Bb.Workflow.Configurations
 {
 
-    public class ConverterVisitor<TContext> : IVisitor<Expression> // where TContext : Context
+    public class StateConverterVisitor<TContext> : IVisitor<Expression> // where TContext : Context
     {
 
-        public ConverterVisitor()
+        public StateConverterVisitor()
         {
             this._actions = MethodDiscovery.GetActions<TContext>(true, typeof(bool), typeof(TContext));
             this._context = Expression.Parameter(typeof(TContext), "context");

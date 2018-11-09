@@ -7,16 +7,14 @@ using Bb.Core;
 namespace Bb.BusinessRule.Configurations
 {
 
-    internal class CompilerVisitor : CompilerModelTranslatorVisitor
+    internal class IncomingCompilerVisitor : CompilerModelTranslatorVisitor
     {
-        private readonly string _domain;
-        private readonly string _version;
 
-        public CompilerVisitor(PocoModelRepository repository, string domain, string version)
+        public IncomingCompilerVisitor(PocoModelRepository repository, string domain, string version)
             : base(repository)
         {
-            this._domain = domain;
-            this._version = version;
+            _domain = domain;
+            _version = version;
         }
 
         public override object Visit(CompilerModelRoot root)
@@ -56,6 +54,9 @@ namespace Bb.BusinessRule.Configurations
             return result;
 
         }
+
+        private readonly string _domain;
+        private readonly string _version;
 
     }
 

@@ -116,7 +116,7 @@ namespace Bb.Compilers.Pocos
             catch (Exception ex)
             {
 
-                result.Excepton = ex;
+                result.Exception = ex;
 
                 if (System.Diagnostics.Debugger.IsAttached)
                     System.Diagnostics.Debugger.Break();

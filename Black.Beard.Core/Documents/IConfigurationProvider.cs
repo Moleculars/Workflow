@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using Bb.ComponentModel;
+using System.Collections.Generic;
 using System.Text;
 
 namespace Bb.Core.Documents
@@ -12,6 +13,8 @@ namespace Bb.Core.Documents
         /// </summary>
         void Initialize();
 
+        TypeDiscovery TypeResolver { get; } 
+        
         /// <summary>
         /// Load one configuration in memory
         /// </summary>

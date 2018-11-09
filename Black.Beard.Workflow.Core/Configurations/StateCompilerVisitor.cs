@@ -6,10 +6,10 @@ using System;
 namespace Bb.Workflow.Configurations
 {
 
-    internal class CompilerVisitor : CompilerModelTranslatorVisitor
+    internal class StateCompilerVisitor : CompilerModelTranslatorVisitor
     {
 
-        public CompilerVisitor(PocoModelRepository repository)
+        public StateCompilerVisitor(PocoModelRepository repository)
             : base(repository)
         {
 

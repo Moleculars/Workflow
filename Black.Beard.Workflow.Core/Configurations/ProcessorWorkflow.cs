@@ -21,7 +21,7 @@ namespace Bb.Workflow.Configurations
             if (this._config.Errors.Any())
                 throw new Exception($"the configuration have errors");
 
-            this.InitialState = this._config.States.FirstOrDefault(c => c.IsInitial);
+            this.InitialState = this._config.States.Single(c => c.IsInitial);
 
             this.Matchings = config.Matchings;
 
