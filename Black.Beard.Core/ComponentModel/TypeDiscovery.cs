@@ -101,6 +101,48 @@ namespace Bb.ComponentModel
             try
             {
                 typeResult = Type.GetType(targetType);
+
+                if (typeResult == null)
+                {
+                    var targetype = targetType.Split(',');
+                    var assemblyName = targetype[0].Trim();
+                    var typeName = targetype[1].Trim();
+
+                    Assembly assembly = null;
+
+                    #region resolve assembly
+
+                    LoadAssemblies();
+                    var result = new List<Type>();
+                    var assemblies = Assemblies().ToArray();
+                    foreach (var item in assemblies)
+                    {
+
+                        string name = item.GetName().Name;
+                        if (name == assemblyName)
+                        {
+                            assembly = item;
+                            break;
+                        }
+                    }
+
+                    if (assembly == null)
+                        throw new DllNotFoundException(assemblyName);
+
+                    #endregion resolve assembly
+
+                    foreach (Type type in assembly.ExportedTypes)
+                    {
+                        string ns = type.Namespace + "." + type.Name;
+                        if (ns == typeName)
+                        {
+                            typeResult = type;
+                            break;  
+                        }
+                    }
+
+                }
+
             }
             finally
             {

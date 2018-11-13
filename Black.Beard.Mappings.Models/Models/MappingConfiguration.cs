@@ -1,17 +1,19 @@
 ﻿using Newtonsoft.Json;
-using System;
 using System.Collections.Generic;
 using System.Text;
 
 namespace Bb.Mappings.Models
 {
 
+    [System.Diagnostics.DebuggerDisplay("{SourceType} -> {TargetType}")]
     public class MappingConfiguration
     {
+        internal int LineNumber;
+        internal int LinePosition;
 
         public MappingConfiguration()
         {
-            this.Mappings = new List<MappingItemConfiguration>();
+            Mappings = new List<MappingItemConfiguration>();
         }
 
         public string SourceType { get; set; }
@@ -20,40 +22,21 @@ namespace Bb.Mappings.Models
 
         public List<MappingItemConfiguration> Mappings { get; set; }
 
-          /// <summary>
+        /// <summary>
         /// Deserializes the payload in <see cref="Bb.Mappings.Models.MappingConfiguration"/>.
         /// </summary>
         /// <param name="sb">The sb.</param>
         /// <returns></returns>
-        public static MappingConfiguration Load(StringBuilder sb)
+        public static MappingConfiguration[] Load(StringBuilder sb)
         {
-            return JsonConvert.DeserializeObject<MappingConfiguration>(sb.ToString()
-                //, new ModelConverter()
+            return JsonConvert.DeserializeObject<MappingConfiguration[]>(sb.ToString()
+                , new MappingConfigurationConverter()
+                , new MappingItemConfigurationConverter()
+                , new PropertyPathConverter()
                 );
 
         }
 
     }
-
-    //public class ModelConverter : JsonConverter
-    //{
-
-    //    public override bool CanConvert(Type objectType)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //    public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-    //    {
-    //        throw new NotImplementedException();
-
-    //    }
-
-    //    public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-    //    {
-    //        throw new NotImplementedException();
-    //    }
-
-    //}
 
 }

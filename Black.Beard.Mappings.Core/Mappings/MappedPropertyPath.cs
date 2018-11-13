@@ -18,10 +18,15 @@ namespace Bb.Mappings.Models
         }
 
         public string Name { get; internal set; }
+
         public MappedPropertyPath Sub { get; internal set; }
+
         public AccessorItem Property { get; internal set; }
+
         public Type Model { get; internal set; }
+
         public MappingRepository Root { get; internal set; }
+
         public FactoryProvider FactoryProvider { get; internal set; }
 
         private IFactory<object> _factory;

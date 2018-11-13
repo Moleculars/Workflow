@@ -1,8 +1,12 @@
 ﻿namespace Bb.Mappings.Models
 {
 
+    [System.Diagnostics.DebuggerDisplay("{SourcePath} -> {TargetPath}")]
     public class MappingItemConfiguration
     {
+
+        internal int LineNumber;
+        internal int LinePosition;
 
         public MappingItemConfiguration()
         {

@@ -87,15 +87,17 @@ namespace Bb.Mappings.Configurations
 
             var repositoryMappings = (MappingRepository)context.Repository;
             var typeResolver = context.TypeResolver;
+
             foreach (var item in documents)
             {
 
-                var model = MappingConfiguration.Load(item.Content);
+                var models = MappingConfiguration.Load(item.Content);
 
-                Type source = typeResolver.ResolveByName(model.SourceType);
-                Type target = typeResolver.ResolveByName(model.TargetType);
-
-                repositoryMappings.Append(model, item.Name, source, target);
+                foreach (var model in models)
+                {
+                    var types = repositoryMappings.ResolveTypes(typeResolver, model);
+                    repositoryMappings.Append(model, item.Name, types.Item1, types.Item2);
+                }
 
             }
 

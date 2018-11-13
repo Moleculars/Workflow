@@ -1,6 +1,5 @@
 ﻿
 using Newtonsoft.Json;
-using System;
 using System.Text;
 
 namespace Bb.Compilers.Models
@@ -45,72 +44,9 @@ namespace Bb.Compilers.Models
             return JsonConvert.DeserializeObject<CompilerModelRoot>(sb.ToString()
 
                 , new PropertyConverter()
-                , new ModelConverter()
+                , new CompilerModelConverter()
 
                 );
-        }
-
-    }
-
-    public class PropertyConverter : JsonConverter
-    {
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(CompilerProperty);
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-
-            var r = reader as JsonTextReader;
-            var instance = new CompilerProperty()
-            {
-                LineNumber = r.LineNumber,
-                LinePosition = r.LinePosition,
-            };
-
-            serializer.Populate(reader, instance);
-
-            return instance;
-
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
-        }
-    }
-
-    public class ModelConverter : JsonConverter
-    {
-
-        public override bool CanConvert(Type objectType)
-        {
-            return objectType == typeof(CompilerModel) || objectType == typeof(CompilerModelRoot);
-        }
-
-        public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
-        {
-
-            var instance = objectType == typeof(CompilerModelRoot)
-                ? new CompilerModelRoot()
-                : new CompilerModel()
-                ;
-
-            var r = reader as JsonTextReader;
-
-            instance.LineNumber = r.LineNumber;
-            instance.LinePosition = r.LinePosition;
-
-            serializer.Populate(reader, instance);
-
-            return instance;
-
-        }
-
-        public override void WriteJson(JsonWriter writer, object value, JsonSerializer serializer)
-        {
-            throw new NotImplementedException();
         }
 
     }
