@@ -13,6 +13,10 @@
 
         }
 
+        public int GetLineNumber() => LineNumber;
+
+        public int GetLinePosition() => LinePosition;
+
         public PropertyPath SourcePath { get; set; }
 
         public PropertyPath TargetPath { get; set; }

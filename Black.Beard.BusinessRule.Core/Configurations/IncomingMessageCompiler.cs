@@ -17,7 +17,7 @@ namespace Bb.BusinessRule.Configurations
         /// </summary>
         /// <param name="document"></param>
         /// <returns></returns>
-        public List<CheckResult> Check(IConfigurationDocument document)
+        public List<CheckResult> CheckPrecompilation(IConfigurationDocument document, CompileContext context)
         {
 
             var result = new List<CheckResult>();
@@ -39,9 +39,8 @@ namespace Bb.BusinessRule.Configurations
                         LineNumber = item.LineNumber,
                         LinePosition = item.LinePosition,
                         Name = item.Name,
-                        Severity = "Error"
+                        Severity = SeverityEnum.Error
                     });
-
                 }
 
             }
@@ -66,13 +65,13 @@ namespace Bb.BusinessRule.Configurations
         /// </summary>
         /// <param name="sb">The sb.</param>
         /// <returns></returns>
-        public List<CheckResult> Check(IEnumerable<IConfigurationDocument> documents)
+        public List<CheckResult> CheckPreCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context)
         {
 
             var result = new List<CheckResult>();
 
             foreach (var document in documents)
-                result.AddRange(Check(document));
+                result.AddRange(CheckPrecompilation(document, context));
 
             return result;
 
@@ -82,7 +81,7 @@ namespace Bb.BusinessRule.Configurations
         /// Compiles the specified documents.
         /// </summary>
         /// <param name="documents">The SBS.</param>
-        public void Initialize(IEnumerable<IConfigurationDocument> documents, CompileContext context)
+        public void InitializePreCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context)
         {
 
             var repository = (PocoModelRepository)context.Repository;
@@ -100,6 +99,28 @@ namespace Bb.BusinessRule.Configurations
 
         }
 
+        public bool InitializeDefault(IConfigurationDocument file, CompileContext context)
+        {
+            return false;
+        }
+
+        public List<CheckResult> CheckPostCompilation(IConfigurationDocument document, CompileContext context)
+        {
+            var result = new List<CheckResult>();
+
+            return result;
+        }
+
+        public List<CheckResult> CheckPostCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context)
+        {
+            var result = new List<CheckResult>();
+
+            foreach (var document in documents)
+                result.AddRange(CheckPostCompilation(document, context));
+
+            return result;
+
+        }
     }
 
 }

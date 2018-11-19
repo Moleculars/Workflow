@@ -44,15 +44,15 @@ namespace Bb.Compilers.Pocos
 
         public AssemblyResult Generate(PocoModelRepository repository, string outputPah)
         {
-
+            
             // Generate code
-            string crc = repository.Crc().ToString();
-            string namespaceName = $"{repository.AssemblyName}_{crc}";
+            //string crc = repository.Crc().ToString();
+            string namespaceName = repository.AssemblyName;
 
             AssemblyResult result = GetAssemblyResult(outputPah, namespaceName);
 
             CodeNamespace ns = new CodeNamespace(namespaceName);
-            GenerateModels(repository, crc, ns);
+            GenerateModels(repository, ns);
             GenerateUsing(repository, ns);
 
             var code = GenerateCode(ns);
@@ -170,12 +170,12 @@ namespace Bb.Compilers.Pocos
                 ns.Imports.Add(new CodeNamespaceImport(item));
         }
 
-        private static void GenerateModels(PocoModelRepository repository, string crc, CodeNamespace ns)
+        private static void GenerateModels(PocoModelRepository repository, CodeNamespace ns)
         {
             foreach (var poco in repository.Pocos)
             {
 
-                CodeTypeDeclaration type = new CodeTypeDeclaration($"{poco.Name}_{crc}")
+                CodeTypeDeclaration type = new CodeTypeDeclaration(poco.Name)
                 {
                     IsClass = true,
                 };
@@ -204,16 +204,16 @@ namespace Bb.Compilers.Pocos
 
                 if (!string.IsNullOrEmpty(poco.BaseName))
                 {
-                    if (repository.Pocos.Any(c => c.Name == poco.BaseName))
-                        type.BaseTypes.Add($"{poco.BaseName}_{crc}");
-                    else
+                    //if (repository.Pocos.Any(c => c.Name == poco.BaseName))
+                    //    type.BaseTypes.Add($"{poco.BaseName}_{crc}");
+                    //else
                         type.BaseTypes.Add(poco.BaseName);
                 }
 
                 foreach (var _interface in poco.Interfaces)
                     type.BaseTypes.Add(_interface);
 
-                GenerateProperties(repository, crc, poco, type);
+                GenerateProperties(repository, poco, type);
 
                 ns.Types.Add(type);
 
@@ -274,11 +274,11 @@ namespace Bb.Compilers.Pocos
 
         }
 
-        private static void GenerateProperties(PocoModelRepository repository, string crc, PocoModel poco, CodeTypeDeclaration type)
+        private static void GenerateProperties(PocoModelRepository repository, PocoModel poco, CodeTypeDeclaration type)
         {
 
             foreach (var property in poco.Properties)
-                GenerateProperty(repository, crc, poco, type, property);
+                GenerateProperty(repository, poco, type, property);
 
         }
 
@@ -296,10 +296,10 @@ namespace Bb.Compilers.Pocos
 
         }
 
-        private static void GenerateProperty(PocoModelRepository repository, string crc, PocoModel poco, CodeTypeDeclaration type, PocoProperty property)
+        private static void GenerateProperty(PocoModelRepository repository, PocoModel poco, CodeTypeDeclaration type, PocoProperty property)
         {
 
-            CodeTypeReference tt = ResolveType(repository, crc, poco, property);
+            CodeTypeReference tt = ResolveType(repository, poco, property);
 
             var _property = new CodeMemberProperty()
             {
@@ -340,7 +340,7 @@ namespace Bb.Compilers.Pocos
 
         }
 
-        private static CodeTypeReference ResolveType(PocoModelRepository repository, string crc, PocoModel poco, PocoProperty property)
+        private static CodeTypeReference ResolveType(PocoModelRepository repository, PocoModel poco, PocoProperty property)
         {
             string propertyType = property.Type;
             PocoModel reference = repository.Get(propertyType);
@@ -352,8 +352,8 @@ namespace Bb.Compilers.Pocos
                     //     throw new Exception($"{propertyType} can't be resolved in {poco.Name}.{property.Name}");
                 }
             }
-            else
-                propertyType = $"{propertyType}_{crc}";
+            //else
+            //    propertyType = $"{propertyType}_{crc}";
 
             var tt = property.IsArray
                     ? new CodeTypeReference(new CodeTypeReference(propertyType), 1)

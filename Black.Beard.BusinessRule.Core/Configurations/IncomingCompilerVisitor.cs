@@ -26,10 +26,11 @@ namespace Bb.BusinessRule.Configurations
             result.Interfaces.Add(nameof(ISourceEvent));
 
             result.Attributes.Add(
-                new PocoModelAttribute("ExposeIncomingMessage",
+                new PocoModelAttribute("ExposeModel",
                     new PocoModelAttributeArgument() { Value = _domain, IsString = true },
                     new PocoModelAttributeArgument() { Value = _version, IsString = true },
-                    new PocoModelAttributeArgument() { Value = root.Key, IsString = true }
+                    new PocoModelAttributeArgument() { Value = root.Key, IsString = true },
+                    new PocoModelAttributeArgument() { Value = "incomingSource", IsString = true }
             ));
 
             result.Properties.AddRange(
@@ -47,7 +48,7 @@ namespace Bb.BusinessRule.Configurations
 
             base._repository.AddUsings(
                 typeof(ISourceEvent),
-                typeof(ExposeIncomingMessage)
+                typeof(ExposeModel)
     );
 
 

@@ -6,12 +6,14 @@ namespace Bb.Core.Documents
 {
     public class TypeConfigurations : IEnumerable<TypeConfiguration>
     {
-
+        private readonly HashSet<string> _excludeFromLog;
         private readonly Dictionary<string, TypeConfiguration> _dicByName;
         private readonly Dictionary<string, TypeConfiguration> _dicByExtension;
 
         public TypeConfigurations(params TypeConfiguration[] types)
         {
+
+            _excludeFromLog = new HashSet<string> { "cs", "pdb", "dll", "bck", "json" };
 
             _dicByName = new Dictionary<string, TypeConfiguration>();
             _dicByExtension = new Dictionary<string, TypeConfiguration>();
@@ -60,13 +62,19 @@ namespace Bb.Core.Documents
         /// <summary>
         /// Gets the configuration of the type by specified extension.
         /// </summary>
-        /// <param name="type">The type.</param>
+        /// <param name="extension">The type.</param>
         /// <returns></returns>
-        public TypeConfiguration GetByExtension(string type)
+        public TypeConfiguration GetByExtension(string extension)
         {
 
-            if (!_dicByExtension.TryGetValue(type.ToLowerInvariant(), out TypeConfiguration _type))
-                Trace.WriteLine($"the extension {type} can resolve the configuration type");
+            string e = extension = extension.ToLowerInvariant();
+
+            if (e[0] == '.')
+                e = e.Substring(1);
+
+            if (!_dicByExtension.TryGetValue(e, out TypeConfiguration _type))
+                if (!_excludeFromLog.Contains(e))
+                    Trace.WriteLine($"the extension {e} can resolve the configuration type", "Debug");
 
             return _type;
         }

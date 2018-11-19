@@ -1,4 +1,5 @@
-﻿using Bb.Core.Documents;
+﻿using Bb.ComponentModel;
+using Bb.Core.Documents;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -58,12 +59,16 @@ namespace Bb.Workflow.Configurations.Documents.Files
         public void Load(DirectoryInfo version)
         {
 
+            TypeReferential _typeReferential = new TypeReferential();
+
             LocalStorageConfigurationVersion item = new LocalStorageConfigurationVersion(this)
             {
                 Folder = version,
                 Name = version.Name,
                 LastUpdate = version.LastWriteTimeUtc,
             };
+
+            item.Initialize(_typeReferential);
 
             //LocalStorageGlobalConfigurationListItem.BuildProcessor(version.FullName);
 

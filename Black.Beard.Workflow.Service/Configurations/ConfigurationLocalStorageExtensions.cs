@@ -4,6 +4,7 @@ using Bb.Workflow.Configurations.Documents.Files;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using System;
+using Bb.ComponentModel;
 
 namespace Bb.Workflow.Service.Configurations
 {
@@ -39,13 +40,13 @@ namespace Bb.Workflow.Service.Configurations
         /// Fournit un environement d'évaluation de workflow
         /// </summary>
         /// <returns></returns>
-        private static /*AnomalyProcessor*/ object BuildProcessor(string path /*, Action<PushedAction> pushAction*/)
+        private static /*AnomalyProcessor*/ object BuildProcessor(ComponentModel.TypeReferential typeReferential, string path /*, Action<PushedAction> pushAction*/)
         {
 
             //ProcessorWorkflow<ContextAnomaly> wrk = null;   // for debug
             ConfigConverterWorkflowVisitor wrk2 = null;     // for debug
 
-            ExtendedDataServiceProvider _extendedDataServices = new ExtendedDataServiceProvider(true);
+            ExtendedDataServiceProvider _extendedDataServices = new ExtendedDataServiceProvider(typeReferential, true);
 
             // fournisseur de regle conversion d'evenement d'entrée en event workflow
             //var ruleService = new RuleServiceProviderOnFiles<Colis21Event, ContextAnomaly>(path);

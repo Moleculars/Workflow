@@ -14,8 +14,9 @@ namespace Bb.ComponentModel
     {
 
 
-        public MethodDiscoveryAssembly(bool startWith)
+        public MethodDiscoveryAssembly(bool startWith, TypeReferential typeReferential)
         {
+            this._typeReferential = typeReferential;
             this._startWith = startWith;
         }
 
@@ -31,13 +32,10 @@ namespace Bb.ComponentModel
         public IEnumerable<BusinessAction<T>> GetActions<T>(Type returnType, params Type[] methodSign) //where T : Context
         {
 
-            if (TypeReferential.Instance == null)
-                throw new Exception("Please don't forget initialize TypeReferential with TypeReferential.Initialize(new string[] { 'plugin folder' });");
-
             this.returnType = returnType ?? throw new ArgumentNullException(nameof(returnType));
             this.methodSign = methodSign ?? throw new ArgumentNullException(nameof(methodSign));
 
-            var types = TypeReferential.Instance.GetTypesWithAttributes(typeof(ExposeClassAttribute));
+            var types = _typeReferential.GetTypesWithAttributes(typeof(ExposeClassAttribute));
             var actions = this.GetActions_Impl<T>(types.ToArray());
             return actions;
         }
@@ -151,6 +149,7 @@ namespace Bb.ComponentModel
 
         private Type returnType;
         private Type[] methodSign;
+        private readonly TypeReferential _typeReferential;
         private readonly bool _startWith;
     }
 }

@@ -7,7 +7,7 @@
     await Html.RenderPartialAsync(@"TreeConfiguration.cshtml", ViewData);
 }
 
-<h2>Add a new file of type @Model.Type in the version @Model?.Version for the domain @Model?.Domain </h2>
+<h2>Edit @Model.Type for '@Model?.Domain' / '@Model?.Version' </h2>
 
 <div class="col-md-8">
     <form asp-action="SaveFile">

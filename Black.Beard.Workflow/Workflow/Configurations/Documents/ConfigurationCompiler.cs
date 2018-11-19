@@ -1,9 +1,9 @@
 ﻿using Bb.Compilers.Pocos;
-using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using Bb.Core;
 using Bb.Core.Documents;
 using Bb.Mappings.Models;
+using Black.Beard.Core.Documents;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -16,13 +16,14 @@ namespace Bb.Workflow.Configurations.Documents
     internal class ConfigurationCompiler
     {
 
-        public ConfigurationCompiler(string domain, string version, IEnumerable<IConfigurationDocument> documents, TypeConfigurations types, TypeDiscovery typeDiscovery)
+        public ConfigurationCompiler(VersionedConfigurationDocument rootConfig, TypeConfigurations types)
         {
-            _domain = domain;
-            _version = version;
-            _documents = documents;
+
             _types = types;
-            _typeDiscovery = typeDiscovery;
+            _rootconfig = rootConfig;
+
+            var documents = rootConfig.Documents.OrderBy(c => c.TypeConfiguration.CompileSort).ToList();
+            _documents = documents.ToLookup(c => c.TypeConfiguration.Extension);
 
         }
 
@@ -31,107 +32,173 @@ namespace Bb.Workflow.Configurations.Documents
         /// </summary>
         /// <returns><see cref="Bb.Core.CompileResult"/></returns>
         /// <exception cref="NotImplementedException">compiler {type.Name}</exception>
-        public ConfigurationCompileResult Compile()
+        public CompiledConfiguration Compile()
         {
+
+            CompiledConfiguration compiledConfiguration = PrepareCompile();
+
+            compiledConfiguration.Valid =
+
+                InitializePreCompilation(compiledConfiguration, TypeConfiguration.PreCompileLimit) &&
+
+                Compile(compiledConfiguration) &&
+
+                PostCompile(compiledConfiguration) &&
+                LogTrace(compiledConfiguration) &&
+
+                CheckPostCompilation(compiledConfiguration)
+                ;
+
+            return compiledConfiguration;
+
+        }
+
+        private static bool LogTrace(CompiledConfiguration compiledConfiguration)
+        {
+            bool result = true;
+
+            foreach (var item in compiledConfiguration.Diagnostics)
+            {
+                Trace.WriteLine(item.ToString());
+                if (item.Severity == SeverityEnum.Error)
+                    result = false;
+            }
+            return result;
+
+        }
+
+        /// <summary>
+        /// Loop on files flaged PostCompile 
+        /// </summary>
+        /// <param name="configurationCompileResult"></param>
+        /// <returns></returns>
+        public bool PostCompile(CompiledConfiguration configurationCompileResult)
+        {
+
+            foreach (string assemblyName in _rootconfig.Assemblies)
+            {
+                var assembly = _rootconfig.TypeReferential.AddAssemblyFile(assemblyName);
+                if (assembly != null)
+                    _rootconfig.LoadedAssemblies.Add(assembly);
+            }
+
+            foreach (string assemblyName in _rootconfig.CompiledAssemblies)
+            {
+                var assembly = _rootconfig.TypeReferential.AddAssemblyFile(assemblyName);
+                if (assembly != null)
+                    _rootconfig.LoadedAssemblies.Add(assembly);
+            }
+
+            ILookup<string, IConfigurationDocument> documents = Documents();
 
             bool ok = true;
 
-            var configurationCompileResult = new ConfigurationCompileResult()
-            {
-                Domain = _domain,
-                Version = _version,
-            };
-
-            PocoModelRepository repository = new PocoModelRepository(configurationCompileResult.Domain);
-            repository.AddUsings(typeof(ISourceEvent), typeof(ExposeIncomingMessage));      // Add using & references for incomingModel
-            repository.AddUsings(typeof(Models.WorkflowModel), typeof(IWorkflowState));     // Add using & references for workflow state model
-
-            MappingRepository repositoryMapping = new MappingRepository();                  // Mapping builder & mapping repository
-            
-            CompileContext ctx = new CompileContext(configurationCompileResult.Domain, _version)
-            {
-                Repository = repository,
-                RepositoryMapping = repositoryMapping,
-                TypeResolver = _typeDiscovery,
-            };
-
-            // Collect of configuration's document
-            var documents = _documents.ToLookup(c => c.TypeConfiguration.Extension);
-
-            #region Precompile
-
-            // go by type of document because the list is sorted
-            foreach (var type in _types.Where(c => !c.Precompile))
+            foreach (var type in _types.OrderBy(c => c.CompileSort).Where(c => c.PostCompile))
             {
 
                 var items = documents[type.Extension];
 
                 if (items.Any())
-                    if (!Initialize(configurationCompileResult, ctx, type, items))
+                    if (!InitializePreCompilation(configurationCompileResult, Context, type, items)) // Ce n est pas une erreur. Il faut bien appeler InitializePreCompilation
                         ok = false;
 
             }
 
-            #endregion Precompile
+            return ok;
+        }
 
-            #region Compile
+        public bool CheckPostCompilation(CompiledConfiguration configurationCompileResult)
+        {
 
-            if (ok)
+            ILookup<string, IConfigurationDocument> documents = Documents();
+
+            bool ok = true;
+
+            foreach (var type in _types.OrderBy(c => c.CompileSort).Where(c => c.PostCompile))
             {
 
-                string path = new FileInfo(typeof(PocoModelRepository).Assembly.Location).Directory.FullName;
+                var items = documents[type.Extension];
 
-                var r = repository.Generate(path);
-                configurationCompileResult.AssemblyCompiler = r;
-
-                // translate compile error in checkResult for shown in website
-                foreach (DiagnosticResult diag in r.Disgnostics)
-                    foreach (var item in diag.Locations)
-                        configurationCompileResult.Diagnostics.Add(new CheckResult()
-                        {
-                            LineNumber = item.StartLine,
-                            LinePosition = item.StartColumn,
-                            Document = item.FilePath,
-                            Message = diag.Message,
-                            Severity = diag.Severity,
-                        });
-
-                ok = r.Success;
-
-                r.Load(); // Load compiled assembly 
+                if (items.Any())
+                    if (!InitializePreCompilation(configurationCompileResult, Context, type, items))
+                        ok = false;
 
             }
 
-            #endregion Compile
+            return ok;
+        }
 
-            foreach (var item in configurationCompileResult.Diagnostics)
-                Trace.WriteLine(item.ToString());
+        /// <summary>
+        /// Collect of configuration's document
+        /// </summary>
+        /// <returns></returns>
+        public ILookup<string, IConfigurationDocument> Documents()
+        {
+            return _documents;
+        }
 
-            #region Post compile
+        public CompiledConfiguration PrepareCompile()
+        {
 
-            if (ok)
+            var configurationCompileResult = new CompiledConfiguration()
             {
+                Domain = _rootconfig.Domain,
+                Version = _rootconfig.Version,
+            };
 
-                foreach (var type in _types.Where(c => !c.Precompile))
-                {
+            var n = $"{configurationCompileResult.Domain}_{configurationCompileResult.Version}_{GetUniqueKey()}";
 
-                    var items = documents[type.Extension];
+            while (File.Exists(Path.Combine(_rootconfig.PathRoot, n) + ".dll"))
+                n = $"{configurationCompileResult.Domain}_{configurationCompileResult.Version}_{GetUniqueKey()}";
 
-                    if (items.Any())
-                        if (!Initialize(configurationCompileResult, ctx, type, items))
-                            ok = false;
+            repository = new PocoModelRepository(n);
+            repository.AddUsings(typeof(ISourceEvent), typeof(ExposeModel));                // Add using & references for incomingModel
+            repository.AddUsings(typeof(Models.WorkflowModel), typeof(IWorkflowState));     // Add using & references for workflow state model
 
-                }
+            repositoryMapping = new MappingRepository(_rootconfig.TypeReferential);                             // Mapping builder & mapping repository
 
-            }
-
-            #endregion Post compile
+            Context = new CompileContext(_rootconfig.Domain, _rootconfig.Version, _rootconfig.TypeReferential)
+            {
+                VersionedConfiguration = _rootconfig,
+                Repository = repository,
+                RepositoryMapping = repositoryMapping,
+            };
 
             return configurationCompileResult;
 
         }
 
-        private static bool Initialize(ConfigurationCompileResult configurationCompileResult, CompileContext ctx, TypeConfiguration type, IEnumerable<IConfigurationDocument> items)
+        private string GetUniqueKey()
+        {
+            var n2 = Guid.NewGuid().ToString("N");
+            return n2.Substring(0, 4).ToUpper();
+        }
+
+        public bool InitializePreCompilation(CompiledConfiguration configurationCompileResult, int precompileLimit)
+        {
+
+            ILookup<string, IConfigurationDocument> documents = Documents();
+            bool ok = true;
+
+            // go by type of document because the list is sorted by compileSort property
+            foreach (var type in _types
+                                    .OrderBy(c => c.CompileSort)
+                                    .Where(c => c.CompileSort < precompileLimit))
+            {
+
+                var items = documents[type.Extension];
+
+                if (items.Any())
+                    if (!InitializePreCompilation(configurationCompileResult, Context, type, items))
+                        ok = false;
+
+            }
+
+            return ok;
+
+        }
+
+        private static bool InitializePreCompilation(CompiledConfiguration configurationCompileResult, CompileContext ctx, TypeConfiguration type, IEnumerable<IConfigurationDocument> items)
         {
 
             bool ok = true;
@@ -144,7 +211,7 @@ namespace Bb.Workflow.Configurations.Documents
 
             foreach (IConfigurationDocument doc in items)
             {
-                var results = type.Compiler.Check(doc);
+                var results = type.Compiler.CheckPrecompilation(doc, ctx);
                 if (results.Any())
                 {
                     ok = false;
@@ -153,17 +220,67 @@ namespace Bb.Workflow.Configurations.Documents
             }
 
             if (ok)
-                type.Compiler.Initialize(items, ctx);
+                type.Compiler.InitializePreCompilation(items, ctx);
 
             return ok;
 
         }
 
-        private readonly string _domain;
-        private readonly string _version;
-        private readonly IEnumerable<IConfigurationDocument> _documents;
+        public bool Compile(CompiledConfiguration configurationCompileResult)
+        {
+
+            AssemblyResult result = repository.Generate(_rootconfig.PathRoot);
+
+            // translate compile error in checkResult for shown in website
+            foreach (DiagnosticResult diag in result.Disgnostics)
+                foreach (var item in diag.Locations)
+                    configurationCompileResult.Diagnostics.Add(new CheckResult()
+                    {
+                        LineNumber = item.StartLine,
+                        LinePosition = item.StartColumn,
+                        Document = item.FilePath,
+                        Message = diag.Message,
+                        Severity = GetSeverity(diag.Severity),
+                    });
+
+            if (result.Success)
+            {
+                _rootconfig.CompiledAssemblies.Add(result.AssemblyFile);
+                configurationCompileResult.AssemblyPath = result.AssemblyFile;
+            }
+
+            return result.Success;
+
+        }
+
+        private static SeverityEnum GetSeverity(string severity)
+        {
+
+            switch (severity)
+            {
+
+                case "Error":
+                    return SeverityEnum.Error;
+
+                default:
+                    if (System.Diagnostics.Debugger.IsAttached)
+                        System.Diagnostics.Debugger.Break();
+                    Trace.WriteLine($"Failed to convert {severity} in {nameof(SeverityEnum)}");
+                    break;
+
+            }
+
+            return SeverityEnum.Undefined;
+
+        }
+
+        public CompileContext Context { get; private set; }
+
         private readonly TypeConfigurations _types;
-        private readonly TypeDiscovery _typeDiscovery;
+        private readonly VersionedConfigurationDocument _rootconfig;
+        private readonly ILookup<string, IConfigurationDocument> _documents;
+        private PocoModelRepository repository;
+        private MappingRepository repositoryMapping;
     }
 
 }

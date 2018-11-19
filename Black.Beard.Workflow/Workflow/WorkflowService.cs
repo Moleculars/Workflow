@@ -1,4 +1,5 @@
-﻿using Bb.Core;
+﻿using Bb.ComponentModel;
+using Bb.Core;
 using Bb.Workflow.Models;
 using Bb.Workflow.Parser;
 using Bb.Workflow.Parser.Grammar;
@@ -16,8 +17,9 @@ namespace Bb.Workflow.Configurations
         where TContext : IWorkflowContext
     {
 
-        public WorkflowService()
+        public WorkflowService(TypeReferential typeReferential)
         {
+            this._typeReferential = typeReferential;
             this._readKeys = new Dictionary<string, Func<TEvent, string>>();
             this._firstReadKeys = new Dictionary<string, Func<TEvent, string>>();                    
         }
@@ -25,7 +27,7 @@ namespace Bb.Workflow.Configurations
         public void Register()
         {
 
-            var _workflowConverterVisitor = new StateConverterVisitor<TContext>();
+            var _workflowConverterVisitor = new StateConverterVisitor<TContext>(this._typeReferential);
 
             bool haveWorkflow = false;
             foreach (StringBuilder content in this.GetContents())
@@ -179,6 +181,7 @@ namespace Bb.Workflow.Configurations
 
         }
 
+        private readonly TypeReferential _typeReferential;
         private Dictionary<string, Func<TEvent, string>> _readKeys;
         private Dictionary<string, Func<TEvent, string>> _firstReadKeys;
        

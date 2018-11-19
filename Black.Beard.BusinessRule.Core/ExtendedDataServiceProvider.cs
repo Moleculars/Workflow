@@ -14,11 +14,11 @@ namespace Bb.BusinessRule.Models
         /// <summary>
         /// ctor
         /// </summary>
-        public ExtendedDataServiceProvider(bool  autoDetect = false)
+        public ExtendedDataServiceProvider(ComponentModel.TypeReferential typeReferential, bool  autoDetect = false)
         {
             _services = new Dictionary<string, ExtendedDataService>();
             if (autoDetect)
-                Append(new ExtendedDataServiceResolver().ToArray());
+                Append(new ExtendedDataServiceResolver(typeReferential).ToArray());
         }
 
         /// <summary>

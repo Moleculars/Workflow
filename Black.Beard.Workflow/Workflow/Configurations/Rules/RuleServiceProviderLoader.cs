@@ -1,4 +1,5 @@
-﻿using Bb.Core;
+﻿using Bb.ComponentModel;
+using Bb.Core;
 using Bb.Workflow.Models;
 using System;
 using System.Collections.Generic;
@@ -14,8 +15,9 @@ namespace Bb.Workflow.Configurations.Rules
         where TContext : IWorkflowContext
     {
 
-        public RuleServiceProviderLoader()
+        public RuleServiceProviderLoader(TypeReferential typeReferential)
         {
+            this._typeReferential = typeReferential;
             this._readKeys = new Dictionary<string, Func<TSourceEvent, string>>();
             this._firstReadKeys = new Dictionary<string, Func<TSourceEvent, string>>();
         }
@@ -27,7 +29,7 @@ namespace Bb.Workflow.Configurations.Rules
             foreach (StringBuilder content in this.GetContents())
             {
                 haverules = true;
-                var businessRuleBuilder = new BusinessRuleBuilder<TContext>(new RuleConfigBuilderService(string.Empty, content));
+                var businessRuleBuilder = new BusinessRuleBuilder<TContext>(new RuleConfigBuilderService(string.Empty, content), _typeReferential);
                 Register(businessRuleBuilder);
             }
 
@@ -175,6 +177,7 @@ namespace Bb.Workflow.Configurations.Rules
 
         protected abstract IEnumerable<StringBuilder> GetContents();
 
+        private readonly TypeReferential _typeReferential;
         private Dictionary<string, Func<TSourceEvent, string>> _readKeys;
         private Dictionary<string, Func<TSourceEvent, string>> _firstReadKeys;
 

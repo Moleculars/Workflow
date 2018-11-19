@@ -241,7 +241,7 @@ namespace Bb.Workflow.Service.Controllers
                 else
                 {
 
-                    IConfigurationDocument config = _ver.GetFile(type, name);
+                    IConfigurationDocument config = _ver.LoadSubConfigurationDocument(type, name);
 
                     if (config != null)
                     {
@@ -302,7 +302,7 @@ namespace Bb.Workflow.Service.Controllers
                 else
                 {
 
-                    IConfigurationDocument docment = _ver.GetFile(type, name);
+                    IConfigurationDocument docment = _ver.LoadSubConfigurationDocument(type, name);
 
                     if (docment != null)
                     {
@@ -356,11 +356,11 @@ namespace Bb.Workflow.Service.Controllers
                         if (string.IsNullOrEmpty(form.OldName))     // alway empty for creation
                             form.OldName = form.Name;
 
-                        var results = _ver.SaveFile(form.Type, form.OldName, new StringBuilder(form.ModelContent));
+                        var results = _ver.SaveSubConfigurationDocument(form.Type, form.OldName, new StringBuilder(form.ModelContent));
 
                         if (form.OldName != form.Name)
                         {
-                            var file = _ver.GetFile(form.Type, form.OldName);
+                            var file = _ver.LoadSubConfigurationDocument(form.Type, form.OldName);
                             if (!file.Rename(form.OldName))
                                 ModelState.AddModelError("Nmaz", $"Failed to rename the configuration");
 
@@ -399,7 +399,7 @@ namespace Bb.Workflow.Service.Controllers
         public IActionResult CompileVersion(string domain, string version)
         {
 
-            ConfigurationCompileResult result = null;
+            CompiledConfiguration result = null;
 
             if (string.IsNullOrEmpty(domain))
                 ModelState.AddModelError(nameof(domain), $"argument {nameof(domain)} is required");
@@ -410,15 +410,20 @@ namespace Bb.Workflow.Service.Controllers
             var _dom = _context.WorkflowConfiguration.GetDomainConfiguration(domain);
             if (_dom == null)
                 ModelState.AddModelError("Domain", $"domain {domain} not found");
+
             else
             {
+
                 var _ver = _dom.GetVersion(version);
+
                 if (_ver == null)
                     ModelState.AddModelError("Version", $"version {version} not found in domain {domain}");
 
                 else
+                {
                     result = _ver.Compile();
-                
+                }
+
             }
 
             new ConfigurationModelContext()

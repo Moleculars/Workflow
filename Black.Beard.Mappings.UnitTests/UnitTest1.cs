@@ -1,6 +1,9 @@
+using Bb.Compilers.Pocos;
 using Bb.ComponentModel;
+using Bb.ComponentModel.Attributes;
 using Bb.Mappings.Models;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 
@@ -14,7 +17,8 @@ namespace Black.Beard.Mappings.UnitTests
         public void TestCopy1()
         {
 
-            var root = new MappingRepository();
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
 
             var model = new MappingConfiguration()
             {
@@ -46,7 +50,8 @@ namespace Black.Beard.Mappings.UnitTests
         public void TestCopy2()
         {
 
-            var root = new MappingRepository();
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
 
             var model = new MappingConfiguration()
             {
@@ -79,7 +84,8 @@ namespace Black.Beard.Mappings.UnitTests
         public void TestCopy3()
         {
 
-            var root = new MappingRepository();
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
 
             var model = new MappingConfiguration()
             {
@@ -111,8 +117,8 @@ namespace Black.Beard.Mappings.UnitTests
         [TestMethod]
         public void TestCopy4()
         {
-
-            var root = new MappingRepository();
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
 
             var model = new MappingConfiguration()
             {
@@ -145,7 +151,8 @@ namespace Black.Beard.Mappings.UnitTests
         public void TestCopy5()
         {
 
-            var root = new MappingRepository();
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
 
             var model = new MappingConfiguration()
             {
@@ -191,7 +198,8 @@ namespace Black.Beard.Mappings.UnitTests
         public void TestCopy6()
         {
 
-            var root = new MappingRepository();
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
 
             MappingConfiguration[] models = MappingRepository.InitializeAndCollectByName((typeof(SourceModel3), typeof(TargetModel3)));
 
@@ -206,16 +214,95 @@ namespace Black.Beard.Mappings.UnitTests
         public void TestCopy7()
         {
 
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
+
             MappingConfiguration[] models = MappingRepository.InitializeAndCollectByName((typeof(SourceModel4), typeof(TargetModel4)));
 
-            var typeResolver = new TypeDiscovery();         // Type's repository
-            var root = new MappingRepository();
-            root.Append(typeResolver, models);
+            root.Append(models);              // add cofiguration
 
             var modelSource = new SourceModel4() { Name = new TargetModel3() { Name = "Test2" } };
             var target = (TargetModel4)root.ChangeType(modelSource, typeof(TargetModel4));
             Assert.AreEqual(modelSource.Name.Name, target.Name.Name);
 
+        }
+
+        [TestMethod]
+        public void TestCopy8()
+        {
+
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
+
+            PocoModel sourceModel = new PocoModel()
+            {
+                Properties = new PocoProperties()
+                {
+                    new PocoProperty() { Name = "Name" , Type = "System.String"}
+                }
+            };
+            PocoModel targetModel = new PocoModel()
+            {
+                Properties = new PocoProperties()
+                {
+                    new PocoProperty() { Name = "Name" , Type = "System.String"}
+                }
+            };
+
+            MappingConfiguration[] models = root.InitializeAndCollectByName((sourceModel, targetModel));
+
+            var mapping = models.First().Mappings.First();
+
+            Assert.AreEqual(mapping.SourcePath.Name, "Name");
+            Assert.AreEqual(mapping.SourcePath.Name, mapping.TargetPath.Name);
+
+        }
+
+        [TestMethod]
+        public void TestCopy9()
+        {
+
+            TypeReferential typeReferential = new TypeReferential();
+            var root = new MappingRepository(typeReferential);
+
+            PocoModel sourceModel = new PocoModel()
+            {
+                Properties = new PocoProperties()
+                {
+                    new PocoProperty() { Name = "Name" , Type = "keySource"}
+                }
+            };
+            PocoModel targetModel = new PocoModel()
+            {
+                Properties = new PocoProperties()
+                {
+                    new PocoProperty() { Name = "Name" , Type = "keyTarget"}
+                }
+            };
+
+            MappingConfiguration[] models = root.InitializeAndCollectByName((sourceModel, targetModel));
+            var model = models.First();
+
+            //model.EventSourceName = "keySource";
+            //model.TargetState = "keyTarget";
+
+            root.ResolveTypes(model);
+
+            model.SourceType = ConvertToString(typeof(SourceModel4));
+            model.TargetType = ConvertToString(typeof(TargetModel4));
+
+            root.Append(models);
+
+
+
+            //Assert.AreEqual(mapping.SourcePath.Name, "Name");
+            //Assert.AreEqual(mapping.SourcePath.Name, mapping.TargetPath.Name);
+
+        }
+
+        private string ConvertToString(Type type)
+        {
+            return $"{type.Assembly.GetName().Name}, {type.Namespace}.{type.Name}";
         }
 
     }
@@ -250,6 +337,7 @@ namespace Black.Beard.Mappings.UnitTests
 
     }
 
+    [ExposeModel("myDomain", "myVersion", "keySource2", "incomingSource")]
     public class SourceModel3
     {
 
@@ -257,6 +345,7 @@ namespace Black.Beard.Mappings.UnitTests
 
     }
 
+    [ExposeModel("myDomain", "myVersion", "keyTarget2", "Event")]
     public class TargetModel3
     {
 
@@ -264,6 +353,7 @@ namespace Black.Beard.Mappings.UnitTests
 
     }
 
+    [ExposeModel("myDomain", "myVersion", "keySource", "incomingSource")]
     public class SourceModel4
     {
 
@@ -271,6 +361,7 @@ namespace Black.Beard.Mappings.UnitTests
 
     }
 
+    [ExposeModel("myDomain", "myVersion", "keyTarget", "Event")]
     public class TargetModel4
     {
 

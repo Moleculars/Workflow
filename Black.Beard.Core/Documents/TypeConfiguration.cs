@@ -7,14 +7,25 @@ namespace Bb.Core.Documents
     public class TypeConfiguration
     {
 
+        static TypeConfiguration()
+        {
+            PreCompileLimit = 10;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="TypeConfiguration"/> class.
+        /// </summary>
+        /// <param name="name">The name.</param>
+        /// <param name="description">The description.</param>
+        /// <param name="extension">The extension.</param>
         public TypeConfiguration(string name, string description, string extension)
         {
             Name = name;
             Description = description;
             Extension = extension;
 
-            this._templates = new List<IConfigurationTemplateFile>();
-
+            _templates = new List<IConfigurationTemplateFile>();
+            
         }
 
         /// <summary>
@@ -42,19 +53,25 @@ namespace Bb.Core.Documents
         public string Extension { get; }
 
         public IConfigurationDocumentCompiler Compiler { get; set; }
-        public bool Precompile { get; set; }
+
+        public bool PostCompile => CompileSort >= PreCompileLimit;
+
+        public int CompileSort { get; set; }
 
         internal void Add(IConfigurationTemplateFile template)
         {
-            this._templates.Add(template);
+            _templates.Add(template);
         }
 
         public List<IConfigurationTemplateFile> GetTemplates()
         {
-            return this._templates;
+            return _templates;
         }
 
         private readonly List<IConfigurationTemplateFile> _templates;
+
+        public readonly static int PreCompileLimit;
+
 
     }
 

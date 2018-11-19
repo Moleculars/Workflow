@@ -1,5 +1,6 @@
 ﻿using Bb.BusinessRule.Core.Configurations;
 using Bb.BusinessRule.Models;
+using Bb.ComponentModel;
 using System;
 using System.Collections.Generic;
 using System.Linq.Expressions;
@@ -18,8 +19,9 @@ namespace Bb.Workflow.Configurations.Rules
         /// Ctor
         /// </summary>
         /// <param name="ruleConfigBuilderService"></param>
-        public BusinessRuleBuilder(AbstractsRuleConfigBuilderService ruleConfigBuilderService)
+        public BusinessRuleBuilder(AbstractsRuleConfigBuilderService ruleConfigBuilderService, TypeReferential typeReferential)
         {
+            this._typeReferential = typeReferential;
             this._ruleConfigBuilderService = ruleConfigBuilderService;
             this._config = this._ruleConfigBuilderService.GetConfig();
         }
@@ -52,7 +54,7 @@ namespace Bb.Workflow.Configurations.Rules
                         var businessRuleConfig = this._ruleConfigBuilderService.GetConfig();
                         this.EventName = businessRuleConfig.EventName;
                         // Match config with method found in assemblies and build rules
-                        var visitor = new BuildBusinessRuleVisitor<TContext>();
+                        var visitor = new BuildBusinessRuleVisitor<TContext>(_typeReferential);
                         LambdaExpression lambdaExpression = (LambdaExpression)businessRuleConfig.Accept(visitor);
                         this._methodCompiled = lambdaExpression.Compile() as Action<TContext, List<ResultModel>>;
                         this._methodCompiled2 = businessRuleConfig.MethodLoadDatas as Action<TContext>;
@@ -63,6 +65,7 @@ namespace Bb.Workflow.Configurations.Rules
         }
 
         private volatile object _lock = new object();
+        private readonly TypeReferential _typeReferential;
         private AbstractsRuleConfigBuilderService _ruleConfigBuilderService;
         private readonly RuleRepository _config;
         private Action<TContext, List<ResultModel>> _methodCompiled;

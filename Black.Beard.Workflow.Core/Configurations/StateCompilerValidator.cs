@@ -1,20 +1,23 @@
 ﻿using Bb.Compilers.Models;
+using Bb.Compilers.Pocos;
 
 namespace Bb.Workflow.Configurations
 {
     internal class StateCompilerValidator : ValidateCompilerVisitor
     {
-
+        
         public override object Visit(CompilerModelRoot root)
         {
 
             if (string.IsNullOrEmpty(root.Key))
-                Add(root, "Key", "property Key must be Specified");
-            
+                Add(root, "Key", "property 'Key' must be Specified");
+
             if (root.BaseName != "State" && root.BaseName != "Event")
-                Add(root, "BaseName", "property BaseName is restricted (State, Event)");
-            
-            return base.Visit(root);
+                Add(root, "BaseName", "property 'BaseName' is restricted (State, Event)");
+
+            var result = base.Visit(root);
+
+            return result;
 
         }
 
@@ -28,7 +31,7 @@ namespace Bb.Workflow.Configurations
             return base.Visit(property);
         }
 
-
     }
 
 }
+

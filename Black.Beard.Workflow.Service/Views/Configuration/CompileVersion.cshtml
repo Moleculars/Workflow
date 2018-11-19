@@ -1,13 +1,13 @@
-﻿@model Bb.Core.Documents.ConfigurationCompileResult
+﻿@model Bb.Core.Documents.CompiledConfiguration
 
 @{
 
     var ctx = ViewData.Resolve<ConfigurationModelContext>();
     await Html.RenderPartialAsync(@"TreeConfiguration.cshtml", ViewData);
 
-    var assemblyComiler = @Model?.AssemblyCompiler as Bb.Compilers.Pocos.AssemblyResult;
-
+    bool valid = @Model?.Valid ?? false;
     var checks = @Model?.Diagnostics;
+
 }
 
 <h2>Compilation result for the domain @Model?.Domain, version @Model?.Version </h2>
@@ -16,21 +16,13 @@
 
     <div asp-validation-summary="ModelOnly" class="text-danger"></div>
 
-    @if (assemblyComiler != null)
+    @if (!valid)
     {
-
-        @if (!assemblyComiler.Success)
-        {
-            <div>Failed to compile configuration</div>
-        }
-        else
-        {
-            <div>Successfull to compile configuration</div>
-        }
+        <div>Failed to compile configuration</div>
     }
     else
     {
-        <div>Failed to compile configuration</div>
+        <div>Successfull to compile configuration</div>
     }
 
     @if (checks != null)

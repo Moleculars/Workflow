@@ -1,11 +1,13 @@
 ﻿using System.Collections.Generic;
+using System.Diagnostics;
+using System.Reflection;
 
 namespace Bb.Core.Documents
 {
-    public class ConfigurationCompileResult
+    public class CompiledConfiguration
     {
 
-        public ConfigurationCompileResult()
+        public CompiledConfiguration()
         {
             Diagnostics = new List<CheckResult>();
         }
@@ -26,15 +28,17 @@ namespace Bb.Core.Documents
         /// </value>
         public string Version { get; set; }
 
-        /// <summary>
-        /// Gets or sets the assembly compiler.
-        /// </summary>
-        /// <value>
-        /// <see cref="Bb.Core.CompileResult"/> result of assembly complier
-        /// </value>
-        public object AssemblyCompiler { get; set; }
-
         public List<CheckResult> Diagnostics { get; }
+
+        public string AssemblyPath { get; set; }
+
+        public bool Valid { get; set; }
+        
+        public Assembly LoadAssembly()
+        {
+            Trace.WriteLine($"Loading assembly {AssemblyPath}");
+            return Assembly.LoadFile(AssemblyPath);
+        }
 
     }
 

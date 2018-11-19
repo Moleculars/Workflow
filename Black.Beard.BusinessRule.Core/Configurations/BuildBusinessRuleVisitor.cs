@@ -12,11 +12,11 @@ namespace Bb.BusinessRule.Core.Configurations
     {
 
 
-        public BuildBusinessRuleVisitor()
+        public BuildBusinessRuleVisitor(TypeReferential typeReferential)
         {
 
-            this._ruleActions = MethodDiscovery.GetActions<TContext>(true, typeof(bool), typeof(TContext));
-            this._loadDataActions = MethodDiscovery.GetActions<TContext>(true, typeof(void), typeof(TContext));
+            this._ruleActions = MethodDiscovery.GetActions<TContext>(typeReferential, true, typeof(bool), typeof(TContext));
+            this._loadDataActions = MethodDiscovery.GetActions<TContext>(typeReferential, true, typeof(void), typeof(TContext));
 
             this._context = Expression.Parameter(typeof(TContext), "context");
             this._result = Expression.Parameter(typeof(List<ResultModel>), "result");

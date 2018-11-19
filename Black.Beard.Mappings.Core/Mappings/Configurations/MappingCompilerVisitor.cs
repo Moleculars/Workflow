@@ -29,7 +29,7 @@ namespace Bb.Mappings.Configurations
 
             base._repository.AddUsings(
                 typeof(ISourceEvent),
-                typeof(ExposeIncomingMessage)
+                typeof(ExposeModel)
     );
 
 

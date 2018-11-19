@@ -2,13 +2,14 @@
 using System.Collections.Generic;
 using System.Text;
 using Bb.ComponentModel;
+using Black.Beard.Core.Documents;
 
 namespace Bb.Core
 {
     public class CompileContext
     {
 
-        public CompileContext(string domain, string version)
+        public CompileContext(string domain, string version, TypeReferential typeReferential)
         {
             this.Domain = domain;
             this.Version = version;
@@ -31,6 +32,8 @@ namespace Bb.Core
 
         public List<string> StateModels { get; }
 
-        public TypeDiscovery TypeResolver { get; set; }
+        public VersionedConfigurationDocument VersionedConfiguration { get; set; }
+
+
     }
 }

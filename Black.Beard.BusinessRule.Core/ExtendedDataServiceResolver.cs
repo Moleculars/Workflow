@@ -1,4 +1,5 @@
 ﻿using Bb.BusinessRule.Models;
+using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using System;
 using System.Collections;
@@ -11,13 +12,14 @@ namespace Bb.BusinessRule
 
     public class ExtendedDataServiceResolver : IEnumerable<ExtendedDataService>
     {
+        private readonly TypeReferential _typeReferential;
 
-        public ExtendedDataServiceResolver()
+        public ExtendedDataServiceResolver(ComponentModel.TypeReferential typeReferential)
         {
 
-            ComponentModel.TypeReferential.Initialize();
+            this._typeReferential = typeReferential;
 
-            var types = ComponentModel.TypeReferential.Instance
+            var types = this._typeReferential
                 .GetTypesWithAttributes(
                     typeof(ExtendedDataService), 
                     typeof(ExposeClassAttribute)

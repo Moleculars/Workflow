@@ -1,9 +1,12 @@
-﻿using Bb.ComponentModel;
+﻿using Bb.Compilers.Pocos;
+using Bb.ComponentModel;
 using Bb.ComponentModel.Accessors;
+using Bb.ComponentModel.Attributes;
 using Bb.ComponentModel.Factories;
 using Bb.Core.Documents;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace Bb.Mappings.Models
 {
@@ -11,14 +14,14 @@ namespace Bb.Mappings.Models
     public class MappingRepository
     {
 
-        public MappingRepository()
+        public MappingRepository(TypeReferential typeReferential)
         {
+            this._typeReferential = typeReferential;
             _factoryProvider = new FactoryProvider();
             _maps = new Dictionary<Tuple<Type, Type>, MappingConfigurationVerbatim>();
             _chekResults = new List<CheckResult>();
 
         }
-
 
         /// <summary>
         /// Resolves the types of the model by names.
@@ -26,21 +29,49 @@ namespace Bb.Mappings.Models
         /// <param name="typeResolver">The type resolver.</param>
         /// <param name="model">The model.</param>
         /// <returns></returns>
-        public (Type, Type) ResolveTypes(TypeDiscovery typeResolver, MappingConfiguration model)
+        public (Type, Type) ResolveTypes(MappingConfiguration model)
         {
+            
+            if (string.IsNullOrEmpty(model.SourceType))
+                throw new NullReferenceException(nameof(model.SourceType));
 
-            Type source = typeResolver.ResolveByName(model.SourceType);
-            Type target = typeResolver.ResolveByName(model.TargetType);
+            var types = _typeReferential.GetTypesWithAttributes(typeof(ExposeModel));
+
+            foreach (var item in types)
+            {
+                var attribute = item.CustomAttributes.OfType<ExposeModel>().First();
+            }
+
+
+            if (model.SourceType == null)
+            {
+
+            }
+
+            Type source = _typeReferential.ResolveByName(model.SourceType);
+
+
+
+
+            if (string.IsNullOrEmpty(model.TargetType))
+                throw new NullReferenceException(nameof(model.TargetType));
+
+            if (model.TargetType == null)
+            {
+
+            }
+
+            Type target = _typeReferential.ResolveByName(model.TargetType);
 
             return (source, target);
 
         }
 
-        public void Append(TypeDiscovery typeResolver, MappingConfiguration[] models)
+        public void Append(MappingConfiguration[] models)
         {
             foreach (var model in models)
             {
-                var types = ResolveTypes(typeResolver, model);
+                var types = ResolveTypes(model);
                 Append(model, $"C_{types.Item1.Name}{types.Item2.Name}", types.Item1, types.Item2);
             }
 
@@ -163,9 +194,9 @@ namespace Bb.Mappings.Models
                     Document = name,
                     Message = $"{way} property name {propertyName} can't be resolved",
                     Name = propertyName,
-                    Severity = "Error",
-                    LineNumber = path.LineNumber,
-                    LinePosition = path.LinePosition,
+                    Severity = SeverityEnum.Error,
+                    LineNumber = path.GetLineNumber(),
+                    LinePosition = path.GetLinePosition(),
                 });
 
                 return null;
@@ -198,6 +229,16 @@ namespace Bb.Mappings.Models
 
         }
 
+        private static bool IncludeBaseType(string typeName)
+        {
+            Type type = Type.GetType(typeName);
+            if (type != null)
+                return IncludeBaseType(type);
+
+            return type.IsPrimitive || type.IsEnum || type == typeof(String);
+
+        }
+
         private static bool IncludeBaseType(Type type)
         {
             return type.IsPrimitive || type.IsEnum || type == typeof(String);
@@ -208,15 +249,105 @@ namespace Bb.Mappings.Models
             _chekResults.Add(checkResult);
         }
 
-        public IEnumerable<CheckResult> chekResults => _chekResults;
+        public IEnumerable<CheckResult> ChekResults => _chekResults;
 
+        /// <summary>
+        /// Find all mapping by name convention.
+        /// The models found are not added in repository
+        /// </summary>
+        /// <param name="tuples">The tuples.</param>
+        /// <returns></returns>
+        public MappingConfiguration[] InitializeAndCollectByName(params (PocoModel, PocoModel)[] tuples)
+        {
 
-        private readonly FactoryProvider _factoryProvider;
-        private readonly Dictionary<Tuple<Type, Type>, MappingConfigurationVerbatim> _maps;
-        private readonly List<CheckResult> _chekResults;
+            List<MappingConfiguration> results = new List<MappingConfiguration>();
+
+            var noDoublon = new HashSet<Tuple<PocoModel, PocoModel>>() { };
+            var modelsToProcess = new Queue<System.Tuple<PocoModel, PocoModel>>();
+            var hashCollector = new HashSet<System.Tuple<PocoModel, PocoModel>>();
+
+            foreach ((PocoModel, PocoModel) tuple in tuples)
+            {
+                var t = tuple.ToTuple();
+                noDoublon.Add(t);
+                modelsToProcess.Enqueue(t);
+            }
+
+            while (modelsToProcess.Count > 0)
+            {
+
+                var t = modelsToProcess.Dequeue();
+                hashCollector.Clear();
+
+                results.Add(InitializeAndCollectByName(t.Item1, t.Item2, hashCollector));
+
+                foreach (var item in hashCollector)
+                    if (noDoublon.Add(item))
+                        modelsToProcess.Enqueue(item);
+
+            }
+
+            return results.ToArray();
+
+        }
+
+        /// <summary>
+        /// Find all mapping by name convention
+        /// </summary>
+        /// <param name="sourceType">Type of the source.</param>
+        /// <param name="targetType">Type of the target.</param>
+        /// <param name="toGenerate">To generate.</param>
+        /// <returns></returns>
+        private MappingConfiguration InitializeAndCollectByName(PocoModel sourceType, PocoModel targetType, HashSet<Tuple<PocoModel, PocoModel>> toGenerate)
+        {
+
+            var result = new MappingConfiguration()
+            {
+                SourceType = sourceType.Name,
+                TargetType = targetType.Name,
+                //SourceType = $"{sourceType.Assembly.GetName().Name}, {sourceType.Namespace}.{sourceType.Name}",
+                //TargetType = $"{targetType.Assembly.GetName().Name}, {targetType.Namespace}.{targetType.Name}",
+            };
+
+            foreach (var propertySource in targetType.Properties)
+            {
+
+                var propertyTarget = targetType.Properties.FirstOrDefault(c => c.Name == propertySource.Name);
+                if (propertyTarget != null)
+                {
+                    var t1 = IncludeBaseType(propertySource.Type);
+                    var t2 = IncludeBaseType(propertyTarget.Type);
+
+                    if (t1 && t2)
+                    {
+                        result.Mappings.Add(new MappingItemConfiguration()
+                        {
+                            SourcePath = new PropertyPath() { Name = propertySource.Name },
+                            TargetPath = new PropertyPath() { Name = propertyTarget.Name },
+                        });
+                    }
+                    else if (!t1 && !t2)
+                    {
+                        result.Mappings.Add(new MappingItemConfiguration()
+                        {
+                            SourcePath = new PropertyPath() { Name = propertySource.Name },
+                            TargetPath = new PropertyPath() { Name = propertyTarget.Name },
+                        });
+
+                        //toGenerate.Add(Tuple.Create(propertySource.Type, propertyTarget.Type));
+
+                    }
+                }
+            }
+
+            return result;
+
+        }
+
 
         /// <summary>
         /// resolve configuration by name convention
+        /// The models found are not added in repository
         /// </summary>
         /// <param name="tuples">The tuples.</param>
         /// <returns></returns>
@@ -296,6 +427,12 @@ namespace Bb.Mappings.Models
             return result;
 
         }
+
+        private readonly TypeReferential _typeReferential;
+        private readonly FactoryProvider _factoryProvider;
+        private readonly Dictionary<Tuple<Type, Type>, MappingConfigurationVerbatim> _maps;
+        private readonly List<CheckResult> _chekResults;
+
     }
 
 }

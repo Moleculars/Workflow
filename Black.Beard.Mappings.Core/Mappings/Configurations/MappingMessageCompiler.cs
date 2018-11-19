@@ -1,4 +1,4 @@
-﻿using Bb.Compilers.Models;
+﻿using Bb.Compilers.Pocos;
 using Bb.Core;
 using Bb.Core.Documents;
 using Bb.Mappings.Models;
@@ -12,36 +12,101 @@ namespace Bb.Mappings.Configurations
     public class MappingMessageCompiler : IConfigurationDocumentCompiler
     {
 
+
         /// <summary>
         /// Checks the specified configuration embedded in configurationDocument.
         /// </summary>
         /// <param name="document"></param>
         /// <returns></returns>
-        public List<CheckResult> Check(IConfigurationDocument document)
+        public bool InitializeDefault(IConfigurationDocument document, CompileContext context)
+        {
+
+            //var result = new List<CheckResult>();
+            //var repository = (PocoModelRepository)context.Repository;
+
+            //try
+            //{
+            //    var sb = document.Content;
+            //    MappingConfiguration[] models = MappingConfiguration.Load(sb);
+
+            //    foreach (MappingConfiguration model in models)
+            //    {
+            //        if (model.Mappings.Count == 0)
+            //        {
+
+            //            PocoModel s = repository.Get(model.SourceType);
+            //            PocoModel t = repository.Get(model.TargetType);
+
+
+            //        }
+            //    }
+
+            //    return true;
+
+            //}
+            //catch (Exception ex)
+            //{
+
+            //    Trace.WriteLine(ex);
+
+            //    result.Add(new CheckResult() { Document = document.Name, Message = ex.Message });
+
+            //    if (System.Diagnostics.Debugger.IsAttached)
+            //        System.Diagnostics.Debugger.Break();
+
+            //}
+
+            return false;
+
+        }
+
+        /// <summary>
+        /// Checks the specified configuration embedded in configurationDocument.
+        /// </summary>
+        /// <param name="document"></param>
+        /// <returns></returns>
+        public List<CheckResult> CheckPrecompilation(IConfigurationDocument document, CompileContext context)
         {
 
             var result = new List<CheckResult>();
+            var repository = (PocoModelRepository)context.Repository;
 
             try
             {
                 var sb = document.Content;
-                var model = CompilerModelRoot.Load(sb);
+                MappingConfiguration[] models = MappingConfiguration.Load(sb);
 
-                MappingCompilerValidator validator = new MappingCompilerValidator();
-                validator.Visit(model);
-
-                foreach (var item in validator.Dignostics)
+                foreach (MappingConfiguration model in models)
                 {
-                    result.Add(new CheckResult()
+                    if (model.Mappings.Count == 0)
                     {
-                        Document = document.Name,
-                        Message = item.Message,
-                        LineNumber = item.LineNumber,
-                        LinePosition = item.LinePosition,
-                        Name = item.Name,
-                        Severity = "Error"
-                    });
 
+                        var s = repository.Get(model.SourceType);
+                        var t = repository.Get(model.TargetType);
+
+                        if (s == null)
+                            result.Add(new CheckResult()
+                            {
+                                Document = document.Name,
+                                Name = nameof(model.SourceType),
+                                Message = "",
+                                Severity = SeverityEnum.Error,
+                                // LineNumber = document.LineNumber,
+                                // LinePosition = document.LinePosition,
+                            });
+
+                        if (t == null)
+                            result.Add(new CheckResult()
+                            {
+                                Document = document.Name,
+                                Name = nameof(model.TargetType),
+                                Message = "",
+                                Severity = SeverityEnum.Error,
+                                // LineNumber = document.LineNumber,
+                                // LinePosition = document.LinePosition,
+                            });
+
+                    }
                 }
 
             }
@@ -66,13 +131,13 @@ namespace Bb.Mappings.Configurations
         /// </summary>
         /// <param name="sb">The sb.</param>
         /// <returns></returns>
-        public List<CheckResult> Check(IEnumerable<IConfigurationDocument> documents)
+        public List<CheckResult> CheckPreCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context)
         {
 
             var result = new List<CheckResult>();
 
             foreach (var document in documents)
-                result.AddRange(Check(document));
+                result.AddRange(CheckPrecompilation(document, context));
 
             return result;
 
@@ -82,11 +147,11 @@ namespace Bb.Mappings.Configurations
         /// Compiles the specified documents.
         /// </summary>
         /// <param name="documents">The SBS.</param>
-        public void Initialize(IEnumerable<IConfigurationDocument> documents, CompileContext context)
+        public void InitializePreCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context)
         {
 
+            var repository = (PocoModelRepository)context.Repository;
             var repositoryMappings = (MappingRepository)context.Repository;
-            var typeResolver = context.TypeResolver;
 
             foreach (var item in documents)
             {
@@ -95,7 +160,12 @@ namespace Bb.Mappings.Configurations
 
                 foreach (var model in models)
                 {
-                    var types = repositoryMappings.ResolveTypes(typeResolver, model);
+
+                    var s = repository.Get(model.SourceType);
+                    var t = repository.Get(model.TargetType);
+
+                    var types = repositoryMappings.ResolveTypes(model);
+
                     repositoryMappings.Append(model, item.Name, types.Item1, types.Item2);
                 }
 
@@ -103,6 +173,23 @@ namespace Bb.Mappings.Configurations
 
         }
 
+        public List<CheckResult> CheckPostCompilation(IConfigurationDocument document, CompileContext context)
+        {
+            var result = new List<CheckResult>();
+
+            return result;
+
+        }
+
+        public List<CheckResult> CheckPostCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context)
+        {
+            var result = new List<CheckResult>();
+
+            foreach (var document in documents)
+                result.AddRange(CheckPostCompilation(document, context));
+
+            return result;
+        }
     }
 
 }

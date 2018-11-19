@@ -24,19 +24,19 @@ namespace Bb.Workflow.Configurations.Documents.Files
             _domains = new Dictionary<string, LocalStorageDomainConfiguration>();
             _types = new TypeConfigurations
             (
-                new TypeConfiguration("Incoming Messages", "Configuration for incoming messages", "imsg") { Compiler = new IncomingMessageCompiler(), Precompile = true },
-                new TypeConfiguration("State Models", "Configuration for states models", "state") { Compiler = new StateMessageCompiler() , Precompile = true},
+
+                new TypeConfiguration("Incoming Messages", "Configuration for incoming messages", "imsg") { Compiler = new IncomingMessageCompiler(), CompileSort = 1 },
+                new TypeConfiguration("State Models", "Configuration for states models", "state") { Compiler = new StateMessageCompiler(), CompileSort = 2 },
+                new TypeConfiguration("Mapping Models", "Configuration for map incoming models on event state Model", "map") { Compiler = new MappingMessageCompiler(), CompileSort = 3 },
+             
                 new TypeConfiguration("Func rules", "Function rules to apply on incoming message", "csRules"),
                 new TypeConfiguration("Rules", "rules to apply on incoming message", "rules"),
+
                 new TypeConfiguration("Func Workflows", "Function for evaluate workflow", "csworkflows"),
-                new TypeConfiguration("Workflows", "workflow's configurations", "workflows"),
-            
-                new TypeConfiguration("Mapping Models", "Configuration for map incoming models on event state Model", "map") { Compiler = new MappingMessageCompiler() }
+                new TypeConfiguration("Workflows", "workflow's configurations", "workflows")
                 
             );
-
-            TypeResolver = new TypeDiscovery(path.FullName);         // Type's repository
-
+            
         }
 
         /// <summary>
@@ -46,16 +46,16 @@ namespace Bb.Workflow.Configurations.Documents.Files
         /// The types.
         /// </value>
         public TypeConfigurations Types => _types;
-
-        public TypeDiscovery TypeResolver { get; }
-
+        
         /// <summary>
         /// Parse all folder and lLoad all configuration in memory
         /// </summary>
         public void Initialize()
         {
+
             foreach (var item in _path.GetDirectories())
                 EnsureLoaded(item);
+
         }
 
         public void Initialize(string configurationName)
@@ -108,8 +108,6 @@ namespace Bb.Workflow.Configurations.Documents.Files
 
                 default:    // Domains
                     {
-
-                        TypeResolver.AddDirectory(configuration);
 
                         LocalStorageDomainConfiguration config = new LocalStorageDomainConfiguration(this, configuration.Name, configuration.FullName);
                         config.Initialize(configuration);

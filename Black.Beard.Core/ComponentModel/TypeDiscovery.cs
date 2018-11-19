@@ -50,7 +50,6 @@ namespace Bb.ComponentModel
         /// <returns></returns>
         public List<Type> Resolve(Func<Type, bool> typeFilter)
         {
-            LoadAssemblies();
             var result = new List<Type>();
             var assemblies = Assemblies().ToArray();
             result.AddRange(Collect(typeFilter, assemblies));
@@ -64,7 +63,6 @@ namespace Bb.ComponentModel
         /// <returns></returns>
         public List<Type> ResolveWithAttribute(Type baseType, Type typeFilter)
         {
-            LoadAssemblies();
             var result = new List<Type>();
             var assemblies = Assemblies().ToArray();
             result.AddRange(Collect(type =>
@@ -75,19 +73,24 @@ namespace Bb.ComponentModel
             return result;
         }
 
-        /// <summary>
-        /// return a list of type that assignable from the specified type
-        /// </summary>
-        /// <param name="typeFilter"></param>
-        /// <returns></returns>
-        public List<Type> ResolveWithAttribute(Type typeFilter)
+        public Assembly LoadAssembly(string path)
         {
-            LoadAssemblies();
+            var file = new System.IO.FileInfo(path);
+            return LoadAssembly(file);
+        }
+
+        /// <summary>
+        /// return a list of type that contains specified attibute
+        /// </summary>
+        /// <param name="attributeTypeFilter"></param>
+        /// <returns></returns>
+        public List<Type> ResolveWithAttribute(Type attributeTypeFilter)
+        {
             var result = new List<Type>();
             var assemblies = Assemblies().ToArray();
             result.AddRange(Collect(type =>
             {
-                return Attribute.GetCustomAttributes(type, typeFilter).Any();
+                return Attribute.GetCustomAttributes(type, attributeTypeFilter).Any();
             }, assemblies));
 
             return result;
@@ -112,7 +115,6 @@ namespace Bb.ComponentModel
 
                     #region resolve assembly
 
-                    LoadAssemblies();
                     var result = new List<Type>();
                     var assemblies = Assemblies().ToArray();
                     foreach (var item in assemblies)
@@ -137,7 +139,7 @@ namespace Bb.ComponentModel
                         if (ns == typeName)
                         {
                             typeResult = type;
-                            break;  
+                            break;
                         }
                     }
 
@@ -160,7 +162,6 @@ namespace Bb.ComponentModel
         /// <returns></returns>
         public List<Type> Resolve(Type typeFilter)
         {
-            LoadAssemblies();
             var result = new List<Type>();
             var assemblies = Assemblies().ToArray();
             result.AddRange(Collect(type => typeFilter.IsAssignableFrom(type) && type != typeFilter, assemblies));
@@ -174,8 +175,15 @@ namespace Bb.ComponentModel
         /// <param name="configuration"></param>
         public void AddDirectory(DirectoryInfo configuration)
         {
+
+            configuration.Refresh();
+
+            if (!configuration.Exists)
+                throw new DirectoryNotFoundException(configuration.FullName);
+
             if (!paths.Contains(configuration))
                 paths.Add(configuration);
+
         }
 
         private Assembly CurrentDomain_AssemblyResolve(object sender, ResolveEventArgs args)
@@ -206,10 +214,51 @@ namespace Bb.ComponentModel
             return null;
         }
 
+        public Assembly LoadAssembly(FileInfo file)
+        {
+
+            var _h = new HashSet<string>();
+
+            foreach (Assembly assembly in Assemblies())
+                if (!assembly.IsDynamic)
+                    _h.Add(Path.GetFileNameWithoutExtension(assembly.Location));
+
+            AppDomain.CurrentDomain.AssemblyResolve += CurrentDomain_AssemblyResolve;
+
+            try
+            {
+                var n = Path.GetFileNameWithoutExtension(file.FullName);
+                if (_h.Add(n))
+                {
+                    Assembly ass = null;
+                    try
+                    {
+                        //Debug.WriteLine("Loading " + file.FullName);
+                        return ass = Assembly.LoadFile(file.FullName);
+                        //Trace.WriteLine($"the type resolver will search in assembly {ass.GetName().Name}");
+
+                    }
+                    catch (Exception e)
+                    {
+                        OnRegisterException(e);
+                        Trace.TraceError(e.ToString());
+                    }
+                }
+            }
+
+            finally
+            {
+                AppDomain.CurrentDomain.AssemblyResolve -= CurrentDomain_AssemblyResolve;
+            }
+
+            return null;
+
+        }
+
         /// <summary>
         ///     Load in memory all the assemblies from the directory bin.
         /// </summary>
-        private void LoadAssemblies()
+        public void LoadAssembliesFromFolders()
         {
             foreach (var path in paths)
                 LoadAssembliesFrom(path);
@@ -219,8 +268,9 @@ namespace Bb.ComponentModel
         ///     Load in memory all the assemblies from the specified with directory.
         /// </summary>
         /// <returns></returns>
-        private void LoadAssembliesFrom(DirectoryInfo dir)
+        public void LoadAssembliesFrom(DirectoryInfo dir)
         {
+
             var _h = new HashSet<string>();
 
             foreach (var item in Assemblies())

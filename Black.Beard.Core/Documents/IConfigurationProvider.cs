@@ -12,8 +12,6 @@ namespace Bb.Core.Documents
         /// Load all configuration in memory
         /// </summary>
         void Initialize();
-
-        TypeDiscovery TypeResolver { get; } 
         
         /// <summary>
         /// Load one configuration in memory

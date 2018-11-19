@@ -17,15 +17,15 @@ namespace Bb.ComponentModel
         /// </summary>
         /// <param name="types"></param>
         /// <returns></returns>
-        public static Dictionary<string, BusinessAction<T>> GetActions<T>(bool startWith, Type returnType, params Type[] MethodSign) //where T : Context
+        public static Dictionary<string, BusinessAction<T>> GetActions<T>(ComponentModel.TypeReferential typeReferential, bool startWith, Type returnType, params Type[] MethodSign) //where T : Context
         {
 
             if (returnType == null)
                 throw new ArgumentNullException(nameof(returnType));
 
             var result = new Dictionary<string, BusinessAction<T>>();
-            TypeReferential.Initialize();
-            var types = TypeReferential.Instance.GetTypes(typeof(IMethodDiscovery));
+
+            var types = typeReferential.GetTypes(typeof(IMethodDiscovery));
 
             foreach (var type in types)
             {

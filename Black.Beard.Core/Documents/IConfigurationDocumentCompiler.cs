@@ -6,27 +6,52 @@ namespace Bb.Core.Documents
 
     public interface IConfigurationDocumentCompiler
     {
+        
+        /// <summary>
+        /// Initializes the default value if not specified.
+        /// </summary>
+        /// <param name="document">The file.</param>
+        /// <param name="context">The context.</param>
+        bool InitializeDefault(IConfigurationDocument document, CompileContext context);
 
         /// <summary>
         /// Checks the specified configuration embedded in configurationDocument.
         /// </summary>
-        /// <param name="sb">The sb.</param>
+        /// <param name="document">The document.</param>
+        /// <param name="context">The context.</param>
         /// <returns></returns>
-        List<CheckResult> Check(IConfigurationDocument document);
+        List<CheckResult> CheckPrecompilation(IConfigurationDocument document, CompileContext context);
 
         /// <summary>
         /// Checks the specified configuration embedded in configurationDocument list.
         /// </summary>
-        /// <param name="sb">The sb.</param>
+        /// <param name="documents">The documents.</param>
+        /// <param name="context">The context.</param>
         /// <returns></returns>
-        List<CheckResult> Check(IEnumerable<IConfigurationDocument> documents);
+        List<CheckResult> CheckPreCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context);
 
         /// <summary>
         /// prepare to compile the specified documents.
         /// </summary>
         /// <param name="documents">The documents.</param>
         /// <param name="context">The context.</param>
-        void Initialize(IEnumerable<IConfigurationDocument> documents, CompileContext context);
+        void InitializePreCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context);
+        
+        /// <summary>
+        /// Checks the specified configuration embedded in configurationDocument.
+        /// </summary>
+        /// <param name="document">The document.</param>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
+        List<CheckResult> CheckPostCompilation(IConfigurationDocument document, CompileContext context);
+
+        /// <summary>
+        /// Checks the specified configuration embedded in configurationDocument list.
+        /// </summary>
+        /// <param name="documents">The documents.</param>
+        /// <param name="context">The context.</param>
+        /// <returns></returns>
+        List<CheckResult> CheckPostCompilation(IEnumerable<IConfigurationDocument> documents, CompileContext context);
 
     }
 

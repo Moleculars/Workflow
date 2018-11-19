@@ -16,7 +16,7 @@
             <param name="hostContextBuilder"></param>
             <returns></returns>
         </member>
-        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationLocalStorageExtensions.BuildProcessor(System.String)">
+        <member name="M:Bb.Workflow.Service.Configurations.ConfigurationLocalStorageExtensions.BuildProcessor(Bb.ComponentModel.TypeReferential,System.String)">
             <summary>
             Fournit un environement d'évaluation de workflow
             </summary>

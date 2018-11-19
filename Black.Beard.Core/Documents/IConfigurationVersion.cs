@@ -17,7 +17,7 @@ namespace Bb.Core.Documents
         /// <summary>
         /// Compiles the configuration in the specified path.
         /// </summary>
-        ConfigurationCompileResult Compile();
+        CompiledConfiguration Compile();
 
         DateTimeOffset LastUpdate { get; set; }
 
@@ -30,7 +30,7 @@ namespace Bb.Core.Documents
         /// <param name="name">The name.</param>
         /// <param name="stringBuilder">The string builder.</param>
         /// <returns></returns>
-        List<CheckResult> SaveFile(string typeName, string name, StringBuilder stringBuilder);
+        List<CheckResult> SaveSubConfigurationDocument(string typeName, string name, StringBuilder stringBuilder);
 
         /// <summary>
         /// Gets the file by name and type name.
@@ -38,7 +38,7 @@ namespace Bb.Core.Documents
         /// <param name="typeName">The type.</param>
         /// <param name="name">The name.</param>
         /// <returns></returns>
-        IConfigurationDocument GetFile(string typeName, string name);
+        IConfigurationDocument LoadSubConfigurationDocument(string typeName, string name);
 
     }
 

@@ -12,9 +12,9 @@ namespace Bb.Workflow.Configurations
     public class StateConverterVisitor<TContext> : IVisitor<Expression> // where TContext : Context
     {
 
-        public StateConverterVisitor()
+        public StateConverterVisitor(TypeReferential typeReferential)
         {
-            this._actions = MethodDiscovery.GetActions<TContext>(true, typeof(bool), typeof(TContext));
+            this._actions = MethodDiscovery.GetActions<TContext>(typeReferential, true, typeof(bool), typeof(TContext));
             this._context = Expression.Parameter(typeof(TContext), "context");
         }
 

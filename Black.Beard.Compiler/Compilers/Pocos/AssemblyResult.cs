@@ -23,14 +23,14 @@ namespace Bb.Compilers.Pocos
 
         public List<DiagnosticResult> Disgnostics { get; internal set; }
         public bool Success { get; internal set; }
+
         public Exception Exception { get; internal set; }
 
-        public Assembly Load()
+        public Assembly LoadAssembly()
         {
             Trace.WriteLine($"Loading assembly {AssemblyFile}");
             return Assembly.LoadFile(AssemblyFile);
         }
-
     }
 
 }

@@ -30,10 +30,11 @@ namespace Black.Beard.Compilers.UnitTests
                 Interfaces = new PocoInterfaces() { "ISourceEvent" },
                 Attributes = new PocoModelAttributes()
                 {
-                    new PocoModelAttribute("ExposeIncomingMessage",
+                    new PocoModelAttribute("ExposeModel",
                         new PocoModelAttributeArgument() { Value = "myDomain", IsString = true },
                         new PocoModelAttributeArgument() { Value = "myVersion", IsString = true },
-                        new PocoModelAttributeArgument() { Value = "myKey", IsString = true }
+                        new PocoModelAttributeArgument() { Value = "myKey", IsString = true },
+                        new PocoModelAttributeArgument() { Value = "incoming", IsString = true }
                     )
                 },
                 Properties = new PocoProperties()
@@ -48,13 +49,13 @@ namespace Black.Beard.Compilers.UnitTests
 
             repository.AddUsings(
                 typeof(ISourceEvent),
-                typeof(ExposeIncomingMessage)
+                typeof(ExposeModel)
                 );
 
             var result = repository.Generate(path);
 
 
-            var ass = result.Load();
+            var ass = result.LoadAssembly();
 
             var type = ass.DefinedTypes.FirstOrDefault();
 

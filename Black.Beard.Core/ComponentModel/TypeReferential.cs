@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Reflection;
 
 namespace Bb.ComponentModel
 {
@@ -12,36 +13,23 @@ namespace Bb.ComponentModel
         /// Initializes a new instance of the <see cref="TypeReferential"/> class.
         /// </summary>
         /// <param name="paths">The paths.</param>
-        private TypeReferential(params string[] paths)
+        public TypeReferential(params string[] paths)
         {
             this.discover = new TypeDiscovery(paths);
         }
 
-
         /// <summary>
-        /// Initializes <see cref="global::ThisAssembly:TypeReferential"/>: with the specified paths for discover the types.
+        /// Adds the specified path for type reseach.
         /// </summary>
-        /// <param name="paths">The paths.</param>
-        /// <exception cref="System.Exception">Type discover allready initialized</exception>
-        public static void Initialize(params string[] paths)
+        /// <param name="path">The path.</param>
+        public void AddPath(string path)
         {
-
-            if (TypeReferential._instance == null)
-                lock(_lock)
-                    if (TypeReferential._instance == null)
-
-            TypeReferential._instance = new TypeReferential(paths);
-
+            this.discover.AddDirectory(new System.IO.DirectoryInfo(path));
         }
 
-        public static void Clear()
+        public Type ResolveByName(string targetType)
         {
-
-            if (TypeReferential._instance != null)
-                lock (_lock)
-                    if (TypeReferential._instance != null)
-                        TypeReferential._instance = null;
-
+            return this.discover.ResolveByName(targetType);
         }
 
         /// <summary>
@@ -57,6 +45,7 @@ namespace Bb.ComponentModel
                 throw new NullReferenceException(nameof(type));
 
             return this.discover.ResolveWithAttribute(type);
+
         }
 
         /// <summary>
@@ -77,6 +66,11 @@ namespace Bb.ComponentModel
 
             return this.discover.ResolveWithAttribute(baseType, attributeType);
 
+        }
+
+        public Assembly AddAssemblyFile(string path)
+        {
+            return this.discover.LoadAssembly(path);
         }
 
         /// <summary>
@@ -109,22 +103,7 @@ namespace Bb.ComponentModel
             return this.discover.Resolve(fnc);
         }
 
-        /// <summary>
-        /// Gets the instance. (note is not a singleton but unit of work)
-        /// </summary>
-        /// <value>
-        /// The instance.
-        /// </value>
-        public static TypeReferential Instance
-        {
-            get
-            {
-                return TypeReferential._instance;
-            }
-        }
-
         private readonly TypeDiscovery discover;
-        private static TypeReferential _instance;
         private static object _lock = new object();
 
     }

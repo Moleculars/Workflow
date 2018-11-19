@@ -8,8 +8,6 @@ using System.Text;
 using System.Threading.Tasks;
 using Bb.Workflow.Configurations;
 using Bb.BusinessRule.Models;
-using Bb.Workflow.Configurations.Rules.Providers;
-using Bb.Workflow.Providers;
 using Bb.Workflow.Validators;
 using Bb.Core.LocalQueue;
 using Bb.Workflow.Parser.Grammar;

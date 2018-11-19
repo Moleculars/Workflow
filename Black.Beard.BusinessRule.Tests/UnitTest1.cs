@@ -5,6 +5,7 @@ using Bb.BusinessRule.Parser;
 using Bb.BusinessRule.Parser.Grammar;
 using Bb.Compilers.Models;
 using Bb.Compilers.Pocos;
+using Bb.ComponentModel;
 using Bb.ComponentModel.Attributes;
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using System;
@@ -53,7 +54,7 @@ namespace Bb.BusinessRule.Tests
 
             var resultAssembly = rep.Generate(path);
 
-            var ass = resultAssembly.Load();
+            var ass = resultAssembly.LoadAssembly();
 
             var type = ass.DefinedTypes.FirstOrDefault();
 
@@ -77,13 +78,15 @@ namespace Bb.BusinessRule.Tests
       RETURN DROP 'ANOMALIE' 'Reception'
 ";
 
+            TypeReferential typeReferential = new TypeReferential();
+
             // Parse rule and build config
             var _converterVisitor = new ConfigConverterRuleBusinessVisitor();
             var parser = BusinessRuleConfigParser.ParseString(new System.Text.StringBuilder(rules), "test");
             var BusinessRuleConfig = (RuleRepository)parser.Visit(_converterVisitor);
 
             // Match config with method found in assemblies and build rules
-            var visitor = new BuildBusinessRuleVisitor<Context>();
+            var visitor = new BuildBusinessRuleVisitor<Context>(typeReferential);
             LambdaExpression lambdaExpression = (LambdaExpression)BusinessRuleConfig.Accept(visitor);
             var methodCompiled = lambdaExpression.Compile() as Action<Context, List<ResultModel>>;
 
